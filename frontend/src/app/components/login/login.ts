@@ -1,25 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  templateUrl: './login.html',
+  styleUrl: './login.css'
 })
 export class LoginComponent {
-  correo = '';
+  usuario = '';
   password = '';
-  mensaje = '';
 
-  iniciarSesion(): void {
-    if (!this.correo || !this.password) {
-      this.mensaje = 'Todos los campos son obligatorios.';
-      return;
+  @Input() loginExitoso!: () => void;
+
+  login(): void {
+    if (this.usuario && this.password) {
+      this.loginExitoso();
     }
-
-    this.mensaje = 'Inicio de sesión exitoso.';
   }
 }
-

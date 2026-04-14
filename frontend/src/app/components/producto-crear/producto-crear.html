@@ -8,7 +8,7 @@
   <input [(ngModel)]="precio" type="number">
 
   <label>Stock</label>
-  <input [(ngModel)]="stock" type="number">
+<input [(ngModel)]="stock" type="number" step="1" min="0">
 
   <button (click)="guardarProducto()">Guardar</button>
 

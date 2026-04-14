@@ -1,31 +1,37 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Features</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Pricing</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown link
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <li><a class="dropdown-item" href="#">Create Producto</a></li>
-            <li><a class="dropdown-item" href="#">Ver producto</a></li>
-            <li><a class="dropdown-item" href="#">Editar producto</a></li>
-          </ul>
-        </li>
-      </ul>
+<div class="container mt-4">
+  <h1 class="text-center mb-4">Dashboard</h1>
+
+  <div class="row">
+
+    <!-- Tarjeta productos -->
+    <div class="col-md-4">
+      <div class="card text-white bg-primary mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Productos</h5>
+          <p class="card-text">Gestión de productos del inventario</p>
+        </div>
+      </div>
     </div>
+
+    <!-- Tarjeta stock -->
+    <div class="col-md-4">
+      <div class="card text-white bg-success mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Stock</h5>
+          <p class="card-text">Control de inventario disponible</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjeta sistema -->
+    <div class="col-md-4">
+      <div class="card text-white bg-dark mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Sistema</h5>
+          <p class="card-text">Panel de administración</p>
+        </div>
+      </div>
+    </div>
+
   </div>
-</nav>
+</div>

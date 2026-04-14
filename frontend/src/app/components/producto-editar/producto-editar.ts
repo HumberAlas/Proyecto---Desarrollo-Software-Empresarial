@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProductoService } from '../../../services/producto.service';
 import { Producto } from '../../../models/producto.model';
@@ -7,12 +7,15 @@ import { Producto } from '../../../models/producto.model';
   selector: 'app-producto-editar',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './producto-editar.component.html',
-  styleUrl: './producto-editar.component.css'
+  templateUrl: './producto-editar.html',
+  styleUrl: './producto-editar.css'
 })
-export class ProductoEditarComponent {
+export class ProductoEditarComponent implements OnChanges {
+  @Input() productoSeleccionado: Producto | null = null;
+  @Input() volverALista!: () => void;
+
   producto: Producto = {
-    id: 1,
+    id: 0,
     nombre: '',
     precio: 0,
     stock: 0
@@ -20,20 +23,26 @@ export class ProductoEditarComponent {
 
   mensaje = '';
 
-  constructor(private productoService: ProductoService) {
-    const productoEncontrado = this.productoService.obtenerProductoPorId(1);
-    if (productoEncontrado) {
-      this.producto = { ...productoEncontrado };
+  constructor(private productoService: ProductoService) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['productoSeleccionado'] && this.productoSeleccionado) {
+      this.producto = { ...this.productoSeleccionado };
     }
   }
 
   actualizarProducto(): void {
-    if (!this.producto.nombre || this.producto.precio <= 0 || this.producto.stock < 0) {
-      this.mensaje = 'Complete correctamente todos los campos.';
-      return;
-    }
-
-    this.productoService.actualizarProducto(this.producto);
-    this.mensaje = 'Producto actualizado correctamente.';
+  if (
+    !this.producto.nombre ||
+    this.producto.precio <= 0 ||
+    this.producto.stock < 0 ||
+    !Number.isInteger(this.producto.stock)
+  ) {
+    this.mensaje = 'Complete correctamente todos los campos. El stock debe ser un número entero.';
+    return;
   }
+
+  this.productoService.actualizarProducto(this.producto);
+  this.mensaje = 'Producto actualizado correctamente.';
+}
 }
