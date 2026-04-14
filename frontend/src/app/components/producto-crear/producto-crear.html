@@ -1,1 +1,17 @@
-<p>producto-crear works!</p>
+<div class="formulario">
+  <h2>Crear producto</h2>
+
+  <label>Nombre</label>
+  <input [(ngModel)]="nombre" type="text">
+
+  <label>Precio</label>
+  <input [(ngModel)]="precio" type="number">
+
+  <label>Stock</label>
+  <input [(ngModel)]="stock" type="number">
+
+  <button (click)="guardarProducto()">Guardar</button>
+
+  <p>{{ mensaje }}</p>
+</div>
+
