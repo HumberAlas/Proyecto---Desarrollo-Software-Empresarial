@@ -1,11 +1,40 @@
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ProductoService } from '../../../services/producto.service';
 
 @Component({
   selector: 'app-producto-crear',
-  imports: [],
+  standalone: true,
+  imports: [FormsModule],
   templateUrl: './producto-crear.html',
-  styleUrl: './producto-crear.css',
+  styleUrl: './producto-crear.css'
 })
-export class ProductoCrear {
+export class ProductoCrearComponent {
+  nombre = '';
+  precio = 0;
+  stock = 0;
+  mensaje = '';
 
+  constructor(private productoService: ProductoService) {}
+
+  guardarProducto(): void {
+    if (!this.nombre || this.precio <= 0 || this.stock < 0) {
+      this.mensaje = 'Complete correctamente todos los campos.';
+      return;
+    }
+
+    const nuevoProducto = {
+      id: Date.now(),
+      nombre: this.nombre,
+      precio: this.precio,
+      stock: this.stock
+    };
+
+    this.productoService.agregarProducto(nuevoProducto);
+    this.mensaje = 'Producto creado correctamente.';
+
+    this.nombre = '';
+    this.precio = 0;
+    this.stock = 0;
+  }
 }
