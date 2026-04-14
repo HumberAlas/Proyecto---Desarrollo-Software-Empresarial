@@ -1,11 +1,8 @@
-.dashboard {
-  text-align: center;
-  padding: 30px;
+h1 {
+  font-weight: bold;
 }
 
-.acciones {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 20px;
+.card {
+  border-radius: 10px;
+  text-align: center;
 }

@@ -17,7 +17,9 @@
         <td>{{ producto.nombre }}</td>
         <td>${{ producto.precio }}</td>
         <td>{{ producto.stock }}</td>
-        <td><button>Editar</button></td>
+        <td>
+          <button (click)="editarProducto(producto)">Editar</button>
+        </td>
       </tr>
     </tbody>
   </table>

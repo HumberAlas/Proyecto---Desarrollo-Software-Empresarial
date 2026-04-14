@@ -29,4 +29,13 @@ export class ProductoService {
       this.productos[index] = productoActualizado;
     }
   }
+
+  obtenerSiguienteId(): number {
+    if (this.productos.length === 0) {
+      return 1;
+    }
+
+    const maxId = Math.max(...this.productos.map(p => p.id));
+    return maxId + 1;
+  }
 }

@@ -18,23 +18,28 @@ export class ProductoCrearComponent {
   constructor(private productoService: ProductoService) {}
 
   guardarProducto(): void {
-    if (!this.nombre || this.precio <= 0 || this.stock < 0) {
-      this.mensaje = 'Complete correctamente todos los campos.';
-      return;
-    }
-
-    const nuevoProducto = {
-      id: Date.now(),
-      nombre: this.nombre,
-      precio: this.precio,
-      stock: this.stock
-    };
-
-    this.productoService.agregarProducto(nuevoProducto);
-    this.mensaje = 'Producto creado correctamente.';
-
-    this.nombre = '';
-    this.precio = 0;
-    this.stock = 0;
+  if (
+    !this.nombre ||
+    this.precio <= 0 ||
+    this.stock < 0 ||
+    !Number.isInteger(this.stock)
+  ) {
+    this.mensaje = 'Complete correctamente todos los campos. El stock debe ser un número entero.';
+    return;
   }
+
+  const nuevoProducto = {
+    id: this.productoService.obtenerSiguienteId(),
+    nombre: this.nombre,
+    precio: this.precio,
+    stock: this.stock
+  };
+
+  this.productoService.agregarProducto(nuevoProducto);
+  this.mensaje = 'Producto creado correctamente.';
+
+  this.nombre = '';
+  this.precio = 0;
+  this.stock = 0;
+}
 }
