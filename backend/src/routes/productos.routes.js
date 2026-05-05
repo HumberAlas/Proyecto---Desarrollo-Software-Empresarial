@@ -1,9 +1,10 @@
 const express = require("express");
 const Producto = require("../models/producto.model");
+const verificarToken = require("../middleware/auth.middleware");
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", verificarToken, async (req, res) => { 
   try {
     const productos = await Producto.find();
 
