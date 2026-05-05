@@ -2,14 +2,18 @@ const express = require("express");
 const Producto = require("../models/producto.model");
 const verificarToken = require("../middleware/auth.middleware");
 
+
 const router = express.Router();
 
-router.get("/", verificarToken, async (req, res) => { 
+
+router.get("/", verificarToken, async (req, res) => {
   try {
     const productos = await Producto.find();
 
+
     res.json({
       mensaje: "Listado de productos obtenido correctamente",
+      usuarioAutenticado: req.usuario,
       total: productos.length,
       data: productos
     });
@@ -21,15 +25,18 @@ router.get("/", verificarToken, async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+
+router.get("/:id", verificarToken, async (req, res) => {
   try {
     const producto = await Producto.findById(req.params.id);
+
 
     if (!producto) {
       return res.status(404).json({
         mensaje: "Producto no encontrado"
       });
     }
+
 
     res.json({
       mensaje: "Producto encontrado correctamente",
@@ -42,5 +49,6 @@ router.get("/:id", async (req, res) => {
     });
   }
 });
+
 
 module.exports = router;
