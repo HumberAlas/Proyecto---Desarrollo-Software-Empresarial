@@ -10,36 +10,52 @@ import { ProductoService } from '../../../services/producto.service';
   styleUrl: './producto-crear.css'
 })
 export class ProductoCrearComponent {
-  nombre = '';
-  precio = 0;
-  stock = 0;
+  producto = {
+    nombre: '',
+    descripcion: '',
+    precio: 0,
+    stock: 0,
+    categoriaId: '',
+    marcaId: '',
+    proveedorId: '',
+    imagen: ''
+  };
+
   mensaje = '';
 
   constructor(private productoService: ProductoService) {}
 
   guardarProducto(): void {
-  if (
-    !this.nombre ||
-    this.precio <= 0 ||
-    this.stock < 0 ||
-    !Number.isInteger(this.stock)
-  ) {
-    this.mensaje = 'Complete correctamente todos los campos. El stock debe ser un número entero.';
-    return;
+    const stockNumero = Number(this.producto.stock);
+
+    if (
+      !this.producto.nombre ||
+      Number(this.producto.precio) <= 0 ||
+      stockNumero < 0 ||
+      !Number.isInteger(stockNumero)
+    ) {
+      this.mensaje = 'Verifique los campos. El stock debe ser un número entero.';
+      return;
+    }
+
+    this.productoService.crearProducto(this.producto).subscribe({
+      next: () => {
+        this.mensaje = 'Producto creado correctamente';
+
+        this.producto = {
+          nombre: '',
+          descripcion: '',
+          precio: 0,
+          stock: 0,
+          categoriaId: '',
+          marcaId: '',
+          proveedorId: '',
+          imagen: ''
+        };
+      },
+      error: () => {
+        this.mensaje = 'Error al crear producto';
+      }
+    });
   }
-
-  const nuevoProducto = {
-    id: this.productoService.obtenerSiguienteId(),
-    nombre: this.nombre,
-    precio: this.precio,
-    stock: this.stock
-  };
-
-  this.productoService.agregarProducto(nuevoProducto);
-  this.mensaje = 'Producto creado correctamente.';
-
-  this.nombre = '';
-  this.precio = 0;
-  this.stock = 0;
-}
 }

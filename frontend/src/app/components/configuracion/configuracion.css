@@ -1,0 +1,136 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.config-page {
+  min-height: 70vh;
+  background-color: #ffffff;
+}
+
+.config-sidebar {
+  background-color: #ffffff;
+  border: 1px solid #eeeeee;
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.config-link {
+  border: none;
+  background-color: transparent;
+  text-align: left;
+  padding: 13px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #333333;
+  transition: 0.2s ease;
+}
+
+.config-link:hover,
+.config-link.active {
+  background-color: #111111;
+  color: #ffffff;
+}
+
+.config-content {
+  background-color: #ffffff;
+  border: 1px solid #eeeeee;
+  border-radius: 18px;
+  padding: 28px;
+  min-height: 460px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.config-form {
+  max-width: 720px;
+}
+
+.form-control,
+.form-select {
+  border-radius: 12px;
+  min-height: 46px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #111111;
+  box-shadow: 0 0 0 0.15rem rgba(0, 0, 0, 0.12);
+}
+
+.password-box {
+  max-width: 720px;
+  background-color: #f8f9fa;
+  border-radius: 16px;
+  padding: 22px;
+}
+
+.empty-box {
+  background-color: #f8f9fa;
+  border-radius: 16px;
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+}
+
+.pedido-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid #eeeeee;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+  background-color: #ffffff;
+  transition: 0.2s ease;
+}
+
+.pedido-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.pedido-card img {
+  width: 85px;
+  height: 85px;
+  object-fit: contain;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.pedido-entregado {
+  border-left: 5px solid #198754;
+}
+
+.payment-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  background-color: #f8f9fa;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+  .config-content {
+    padding: 20px;
+  }
+
+  .pedido-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .payment-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
