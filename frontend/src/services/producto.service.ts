@@ -1,41 +1,52 @@
 import { Injectable } from '@angular/core';
-import { Producto } from '../models/producto.model';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductoService {
-  private productos: Producto[] = [
-    { id: 1, nombre: 'Teclado', precio: 25, stock: 10 },
-    { id: 2, nombre: 'Mouse', precio: 15, stock: 20 },
-    { id: 3, nombre: 'Monitor', precio: 180, stock: 5 }
-  ];
+  private apiUrl = 'http://localhost:3000';
 
-  obtenerProductos(): Producto[] {
-    return this.productos;
+  constructor(private http: HttpClient) {}
+
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token') || '';
+
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
   }
 
-  obtenerProductoPorId(id: number): Producto | undefined {
-    return this.productos.find(p => p.id === id);
+  obtenerProductos(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/productos/ObtenerTodos`);
   }
 
-  agregarProducto(producto: Producto): void {
-    this.productos.push(producto);
+  obtenerProductoPorId(id: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/productos/ObtenerporId/${id}`);
   }
 
-  actualizarProducto(productoActualizado: Producto): void {
-    const index = this.productos.findIndex(p => p.id === productoActualizado.id);
-    if (index !== -1) {
-      this.productos[index] = productoActualizado;
-    }
+  crearProducto(producto: any): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/productos/RegistrarConImagenes`,
+      producto,
+      { headers: this.getHeaders() }
+    );
   }
 
-  obtenerSiguienteId(): number {
-    if (this.productos.length === 0) {
-      return 1;
-    }
-
-    const maxId = Math.max(...this.productos.map(p => p.id));
-    return maxId + 1;
+  actualizarProducto(producto: any): Observable<any> {
+    return this.http.put(
+      `${this.apiUrl}/productos/ActualizarProducto`,
+      producto,
+      { headers: this.getHeaders() }
+    );
   }
+
+  eliminarProducto(id: string): Observable<any> {
+    return this.http.delete(
+      `${this.apiUrl}/productos/EliminarporId/${id}`,
+      { headers: this.getHeaders() }
+    );
+  }
+  
 }

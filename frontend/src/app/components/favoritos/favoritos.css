@@ -1,0 +1,61 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.favoritos-page {
+  background-color: #ffffff;
+  min-height: 70vh;
+}
+
+.product-img {
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  background-color: #f8f9fa;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.favorito-card {
+  border-radius: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.favorito-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+}
+
+.btn-fav-remove {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background-color: #ffffff;
+  color: #dc3545;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease;
+}
+
+.btn-fav-remove:hover {
+  transform: scale(1.15);
+}
+
+.favoritos-empty {
+  min-height: 260px;
+  background-color: #f8f9fa;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.favoritos-empty i {
+  color: #dc3545;
+}

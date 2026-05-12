@@ -7,6 +7,10 @@ const productoSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    descripcion: {
+      type: String,
+      trim: true
+    },
     precio: {
       type: Number,
       required: true,
@@ -15,16 +19,27 @@ const productoSchema = new mongoose.Schema(
     stock: {
       type: Number,
       required: true,
-      min: 0,
-      validate: {
-        validator: Number.isInteger,
-        message: "El stock debe ser un número entero"
-      }
+      min: 0
     },
-    categoria: {
+    categoriaId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Categoria"
+    },
+    marcaId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Marca"
+    },
+    proveedorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Proveedor"
+    },
+    imagen: {
       type: String,
-      required: true,
-      trim: true
+      default: ""
+    },
+    estado: {
+      type: Boolean,
+      default: true
     }
   },
   {

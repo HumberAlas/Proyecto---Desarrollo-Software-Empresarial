@@ -9,7 +9,11 @@ const categoriaSchema = new mongoose.Schema(
     },
     descripcion: {
       type: String,
-      trim: true
+      default: ""
+    },
+    estado: {
+      type: Boolean,
+      default: true
     }
   },
   {
