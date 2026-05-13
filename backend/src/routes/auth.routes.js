@@ -3,13 +3,11 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Usuario = require("../models/usuario.model");
 
-
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
   try {
     const { nombre, correo, password, rol } = req.body;
-
 
     if (!nombre || !correo || !password || !rol) {
       return res.status(400).json({
@@ -17,9 +15,7 @@ router.post("/register", async (req, res) => {
       });
     }
 
-
     const usuarioExiste = await Usuario.findOne({ correo });
-
 
     if (usuarioExiste) {
       return res.status(400).json({
@@ -27,10 +23,8 @@ router.post("/register", async (req, res) => {
       });
     }
 
-
     const salt = await bcrypt.genSalt(10);
     const passwordEncriptada = await bcrypt.hash(password, salt);
-
 
     const nuevoUsuario = await Usuario.create({
       nombre,
@@ -38,7 +32,6 @@ router.post("/register", async (req, res) => {
       password: passwordEncriptada,
       rol
     });
-
 
     res.status(201).json({
       mensaje: "Usuario registrado correctamente.",
@@ -57,11 +50,9 @@ router.post("/register", async (req, res) => {
   }
 });
 
-
 router.post("/login", async (req, res) => {
   try {
     const { correo, password } = req.body;
-
 
     if (!correo || !password) {
       return res.status(400).json({
@@ -69,9 +60,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
-
     const usuario = await Usuario.findOne({ correo });
-
 
     if (!usuario) {
       return res.status(401).json({
@@ -79,16 +68,13 @@ router.post("/login", async (req, res) => {
       });
     }
 
-
     const passwordValida = await bcrypt.compare(password, usuario.password);
-
 
     if (!passwordValida) {
       return res.status(401).json({
         mensaje: "Credenciales incorrectas."
       });
     }
-
 
     const token = jwt.sign(
       {
@@ -102,7 +88,6 @@ router.post("/login", async (req, res) => {
         expiresIn: process.env.JWT_EXPIRES_IN || "1h"
       }
     );
-
 
     res.json({
       mensaje: "Inicio de sesión correcto.",
@@ -122,7 +107,4 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
 module.exports = router;
-
-

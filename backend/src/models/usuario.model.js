@@ -21,14 +21,13 @@ const usuarioSchema = new mongoose.Schema(
     },
     rol: {
       type: String,
-      required: true,
-      enum: ["Product Owner", "Scrum Master", "Developer", "Administrador"]
+      enum: ["Cliente", "Administrador", "Product Owner", "Scrum Master", "Developer"],
+      default: "Cliente"
     }
   },
   {
     timestamps: true
   }
 );
-
 
 module.exports = mongoose.model("Usuario", usuarioSchema);

@@ -7,6 +7,18 @@ import { ProductoCrearComponent } from './components/producto-crear/producto-cre
 import { ProductoEditarComponent } from './components/producto-editar/producto-editar';
 import { NavbarComponent } from './components/navbar/navbar';
 import { Producto } from '../models/producto.model';
+import { FooterComponent } from './components/footer/footer';
+import { ServiciosComponent } from './components/servicios/servicios';
+import { NosotrosComponent } from './components/nosotros/nosotros';
+import { PromocionesComponent } from './components/promociones/promociones';
+import { CarritoComponent } from './components/carrito/carrito';
+import { FavoritosComponent } from './components/favoritos/favoritos';
+import { ConfiguracionComponent } from './components/configuracion/configuracion';
+import { AdminLoginComponent } from './components/admin-login/admin-login';
+import { AdminProductosComponent } from './components/admin-productos/admin-productos';
+import { AdminProductoFormComponent } from './components/admin-producto-form/admin-producto-form';
+import { AdminUsuariosComponent } from './components/admin-usuarios/admin-usuarios';
+import { AdminPedidosComponent } from './components/admin-pedidos/admin-pedidos';
 
 @Component({
   selector: 'app-root',
@@ -18,56 +30,173 @@ import { Producto } from '../models/producto.model';
     ProductosListaComponent,
     ProductoCrearComponent,
     ProductoEditarComponent,
-    NavbarComponent
+    NavbarComponent,
+    FooterComponent,
+    ServiciosComponent,
+    NosotrosComponent,
+    PromocionesComponent,
+    CarritoComponent,
+    FavoritosComponent,
+    ConfiguracionComponent,
+    AdminLoginComponent,
+    AdminProductosComponent,
+    AdminProductoFormComponent,
+    AdminUsuariosComponent,
+    AdminPedidosComponent
   ],
   template: `
-  <app-navbar
-    [cambiarVista]="cambiarVista.bind(this)"
-    [logueado]="logueado"
-    [cerrarSesion]="cerrarSesion.bind(this)">
-  </app-navbar>
+<app-navbar
+  *ngIf="vista !== 'login' && !esVistaAdmin()"
+  [cambiarVista]="cambiarVista.bind(this)"
+  [logueado]="logueado"
+  [cerrarSesion]="cerrarSesion.bind(this)">
+</app-navbar>
 
   <div *ngIf="mensajeLogin" class="alert alert-success text-center m-2">
     {{ mensajeLogin }}
   </div>
 
   <div [ngSwitch]="vista">
-    <app-login
-      *ngSwitchCase="'login'"
-      [loginExitoso]="iniciarSesion.bind(this)">
-    </app-login>
 
-    <app-dashboard *ngSwitchCase="'dashboard'"></app-dashboard>
+<app-login
+  *ngSwitchCase="'login'"
+  [loginExitoso]="iniciarSesionUsuario.bind(this)">
+</app-login>
+
+    <app-dashboard
+      *ngSwitchCase="'dashboard'"
+      [cambiarVista]="cambiarVista.bind(this)">
+    </app-dashboard>
 
     <app-productos-lista
       *ngSwitchCase="'lista'"
       [editarProducto]="irAEditarProducto.bind(this)">
     </app-productos-lista>
 
-    <app-producto-crear *ngSwitchCase="'crear'"></app-producto-crear>
+    <app-producto-crear
+      *ngSwitchCase="'crear'">
+    </app-producto-crear>
 
     <app-producto-editar
       *ngSwitchCase="'editar'"
       [productoSeleccionado]="productoSeleccionado"
       [volverALista]="volverALista.bind(this)">
     </app-producto-editar>
+
+    <app-servicios
+      *ngSwitchCase="'servicios'">
+    </app-servicios>
+
+    <app-nosotros *ngSwitchCase="'nosotros'"></app-nosotros>
+
+    <app-promociones
+  *ngSwitchCase="'promociones'"
+  [cambiarVista]="cambiarVista.bind(this)">
+</app-promociones>
+
+<app-carrito *ngSwitchCase="'carrito'"></app-carrito>
+
+<app-favoritos *ngSwitchCase="'favoritos'"></app-favoritos>
+
+<app-configuracion
+  *ngSwitchCase="'configuracion'"
+  [cerrarSesion]="cerrarSesion.bind(this)">
+</app-configuracion>
+
+<app-admin-login
+  *ngSwitchCase="'admin-login'"
+  [loginAdminExitoso]="iniciarSesionAdmin.bind(this)">
+</app-admin-login>
+
+<app-admin-productos
+  *ngSwitchCase="'admin-productos'"
+  [cambiarVista]="cambiarVista.bind(this)"
+  [cerrarSesion]="cerrarSesion.bind(this)"
+  [editarProducto]="irAEditarProductoAdmin.bind(this)">
+</app-admin-productos>
+
+<app-admin-producto-form
+  *ngSwitchCase="'admin-crear-producto'"
+  [productoSeleccionado]="null"
+  [cambiarVista]="cambiarVista.bind(this)">
+</app-admin-producto-form>
+
+<app-admin-producto-form
+  *ngSwitchCase="'admin-editar-producto'"
+  [productoSeleccionado]="productoSeleccionado"
+  [cambiarVista]="cambiarVista.bind(this)">
+</app-admin-producto-form>
+
+<app-admin-usuarios
+  *ngSwitchCase="'admin-usuarios'"
+  [cambiarVista]="cambiarVista.bind(this)"
+  [cerrarSesion]="cerrarSesion.bind(this)">
+</app-admin-usuarios>
+
+<app-admin-pedidos
+  *ngSwitchCase="'admin-pedidos'"
+  [cambiarVista]="cambiarVista.bind(this)"
+  [cerrarSesion]="cerrarSesion.bind(this)">
+</app-admin-pedidos>
+
   </div>
+
+  <app-footer *ngIf="vista !== 'login' && vista !== 'admin-login'"></app-footer>
 `
 })
 export class AppComponent {
-  vista = 'dashboard';
+
   productoSeleccionado: Producto | null = null;
 
-  logueado = false;
+  logueado = !!localStorage.getItem('token');
   mensajeLogin = '';
 
+  vista = this.obtenerVistaInicial()
+
   cambiarVista(vista: string): void {
-    this.vista = vista;
+  const vistasPrivadas = [
+    'dashboard',
+    'lista',
+    'crear',
+    'editar',
+    'servicios',
+    'nosotros',
+    'promociones',
+    'carrito',
+    'favoritos',
+    'configuracion'
+  ];
+
+  const vistasAdmin = [
+    'admin-productos',
+    'admin-crear-producto',
+    'admin-editar-producto',
+    'admin-usuarios',
+    'admin-pedidos'
+  ];
+
+  if ([...vistasPrivadas, ...vistasAdmin].includes(vista) && !this.logueado) {
+    this.vista = 'login';
+    return;
   }
+
+  if (vistasAdmin.includes(vista) && !this.esAdmin()) {
+    this.vista = 'dashboard';
+    return;
+  }
+
+  this.vista = vista;
+}
 
   iniciarSesion(): void {
     this.logueado = true;
-    this.vista = 'dashboard';
+
+    if (this.esAdmin()) {
+      this.vista = 'admin-productos';
+    } else {
+      this.vista = 'dashboard';
+    }
+
     this.mensajeLogin = '✔ Inicio de sesión correcto';
 
     setTimeout(() => {
@@ -75,18 +204,106 @@ export class AppComponent {
     }, 3000);
   }
 
+  obtenerVistaInicial(): string {
+    const params = new URLSearchParams(window.location.search);
+    const accesoAdmin = params.get('admin');
+
+    if (accesoAdmin === 'login') {
+      return 'admin-login';
+    }
+
+    if (!this.logueado) {
+      return 'login';
+    }
+
+    if (this.esAdmin()) {
+      return 'admin-productos';
+    }
+
+    return 'dashboard';
+  }
+
   cerrarSesion(): void {
+    const estabaEnVistaAdmin = this.esVistaAdmin();
+
+    localStorage.clear();
     this.logueado = false;
-    this.vista = 'login';
+    this.productoSeleccionado = null;
+
+    if (estabaEnVistaAdmin) {
+      this.vista = 'admin-login';
+    } else {
+      this.vista = 'login';
+    }
   }
 
   irAEditarProducto(producto: Producto): void {
+    if (!this.logueado) {
+      this.vista = 'login';
+      return;
+    }
+
     this.productoSeleccionado = { ...producto };
     this.vista = 'editar';
   }
 
-  volverALista(): void {
-    this.vista = 'lista';
+  irAEditarProductoAdmin(producto: any): void {
+    this.productoSeleccionado = { ...producto };
+    this.vista = 'admin-editar-producto';
   }
-} 
 
+  volverALista(): void {
+    this.cambiarVista('lista');
+  }
+
+  obtenerRol(): string {
+    return localStorage.getItem('rol') || '';
+  }
+
+  obtenerTipoLogin(): string {
+    return localStorage.getItem('tipoLogin') || '';
+  }
+
+  esAdmin(): boolean {
+    return this.obtenerRol() === 'Administrador' && this.obtenerTipoLogin() === 'admin';
+  }
+
+  iniciarSesionUsuario(): void {
+    this.logueado = true;
+    this.vista = 'dashboard';
+
+    this.mensajeLogin = '✔ Inicio de sesión correcto';
+
+    setTimeout(() => {
+      this.mensajeLogin = '';
+    }, 3000);
+  }
+
+  iniciarSesionAdmin(): void {
+    this.logueado = true;
+
+    if (this.esAdmin()) {
+      this.vista = 'admin-productos';
+    } else {
+      this.vista = 'admin-login';
+    }
+
+    this.mensajeLogin = '✔ Inicio de sesión administrador correcto';
+
+    setTimeout(() => {
+      this.mensajeLogin = '';
+    }, 3000);
+  }
+
+  esVistaAdmin(): boolean {
+    return [
+      'admin-login',
+      'admin-dashboard',
+      'admin-productos',
+      'admin-crear-producto',
+      'admin-editar-producto',
+      'admin-usuarios',
+      'admin-pedidos'
+    ].includes(this.vista);
+  }
+}
