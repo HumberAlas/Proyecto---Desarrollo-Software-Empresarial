@@ -2,7 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductoService } from '../../../services/producto.service';
 import { BusquedaService } from '../../../services/busqueda.service';
-
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -17,7 +16,6 @@ export class DashboardComponent implements OnInit {
   laptopsNuevas: any[] = [];
   productosAsus: any[] = [];
   mensajeError = '';
-
   private categoriaLaptopId = '1';
   private marcaAsusId = '1';
 
