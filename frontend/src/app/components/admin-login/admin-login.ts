@@ -41,6 +41,7 @@ export class AdminLoginComponent {
         localStorage.setItem('rol', respuesta.rol || respuesta.usuario?.rol || 'Administrador');
 
         localStorage.setItem('tipoLogin', 'admin');
+        sessionStorage.setItem('vistaActual', 'admin-productos');
 
         this.loginAdminExitoso();
       },

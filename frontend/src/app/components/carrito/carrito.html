@@ -17,6 +17,14 @@
   <div class="container">
     <h3 class="fw-bold mb-4">Tu carrito</h3>
 
+    <div *ngIf="mensajeError" class="alert alert-danger">
+  {{ mensajeError }}
+</div>
+
+<div *ngIf="mensaje" class="alert alert-success">
+  {{ mensaje }}
+</div>
+
     <div class="row">
 
       <!-- Lista de productos -->

@@ -2,14 +2,15 @@ const mongoose = require("mongoose");
 
 const marcaSchema = new mongoose.Schema(
   {
-    nombre: {
+    MarcaID: {
+      type: Number,
+      required: true,
+      unique: true
+    },
+    Nombre: {
       type: String,
       required: true,
       trim: true
-    },
-    estado: {
-      type: Boolean,
-      default: true
     }
   },
   {

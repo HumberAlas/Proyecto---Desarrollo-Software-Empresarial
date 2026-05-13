@@ -19,6 +19,7 @@ import { AdminProductosComponent } from './components/admin-productos/admin-prod
 import { AdminProductoFormComponent } from './components/admin-producto-form/admin-producto-form';
 import { AdminUsuariosComponent } from './components/admin-usuarios/admin-usuarios';
 import { AdminPedidosComponent } from './components/admin-pedidos/admin-pedidos';
+import { ProductoDetalleComponent } from './components/producto-detalle/producto-detalle';
 
 @Component({
   selector: 'app-root',
@@ -42,11 +43,12 @@ import { AdminPedidosComponent } from './components/admin-pedidos/admin-pedidos'
     AdminProductosComponent,
     AdminProductoFormComponent,
     AdminUsuariosComponent,
-    AdminPedidosComponent
+    AdminPedidosComponent,
+    ProductoDetalleComponent
   ],
   template: `
 <app-navbar
-  *ngIf="vista !== 'login' && !esVistaAdmin()"
+  *ngIf="vista !== 'login' && vista !== 'admin-login' && !esVistaAdmin()"
   [cambiarVista]="cambiarVista.bind(this)"
   [logueado]="logueado"
   [cerrarSesion]="cerrarSesion.bind(this)">
@@ -64,14 +66,17 @@ import { AdminPedidosComponent } from './components/admin-pedidos/admin-pedidos'
 </app-login>
 
     <app-dashboard
-      *ngSwitchCase="'dashboard'"
-      [cambiarVista]="cambiarVista.bind(this)">
-    </app-dashboard>
+  *ngSwitchCase="'dashboard'"
+  [cambiarVista]="cambiarVista.bind(this)"
+  [verDetalleProducto]="irADetalleProducto.bind(this)">
+</app-dashboard>
 
-    <app-productos-lista
-      *ngSwitchCase="'lista'"
-      [editarProducto]="irAEditarProducto.bind(this)">
-    </app-productos-lista>
+<app-productos-lista
+  *ngSwitchCase="'lista'"
+  [editarProducto]="irAEditarProducto.bind(this)"
+  [verDetalleProducto]="irADetalleProducto.bind(this)"
+  [cambiarVista]="cambiarVista.bind(this)">
+</app-productos-lista>
 
     <app-producto-crear
       *ngSwitchCase="'crear'">
@@ -96,7 +101,11 @@ import { AdminPedidosComponent } from './components/admin-pedidos/admin-pedidos'
 
 <app-carrito *ngSwitchCase="'carrito'"></app-carrito>
 
-<app-favoritos *ngSwitchCase="'favoritos'"></app-favoritos>
+<app-favoritos
+  *ngSwitchCase="'favoritos'"
+  [verDetalleProducto]="irADetalleProducto.bind(this)"
+  [cambiarVista]="cambiarVista.bind(this)">
+</app-favoritos>
 
 <app-configuracion
   *ngSwitchCase="'configuracion'"
@@ -139,6 +148,12 @@ import { AdminPedidosComponent } from './components/admin-pedidos/admin-pedidos'
   [cerrarSesion]="cerrarSesion.bind(this)">
 </app-admin-pedidos>
 
+<app-producto-detalle
+  *ngSwitchCase="'detalle-producto'"
+  [productoSeleccionado]="productoSeleccionado"
+  [cambiarVista]="cambiarVista.bind(this)">
+</app-producto-detalle>
+
   </div>
 
   <app-footer *ngIf="vista !== 'login' && vista !== 'admin-login'"></app-footer>
@@ -154,38 +169,59 @@ export class AppComponent {
   vista = this.obtenerVistaInicial()
 
   cambiarVista(vista: string): void {
-  const vistasPrivadas = [
-    'dashboard',
-    'lista',
-    'crear',
-    'editar',
-    'servicios',
-    'nosotros',
-    'promociones',
-    'carrito',
-    'favoritos',
-    'configuracion'
-  ];
+    const vistasPublicas = [
+      'dashboard',
+      'lista',
+      'detalle-producto',
+      'servicios',
+      'nosotros',
+      'promociones',
+      'login',
+      'admin-login'
+    ];
 
-  const vistasAdmin = [
-    'admin-productos',
-    'admin-crear-producto',
-    'admin-editar-producto',
-    'admin-usuarios',
-    'admin-pedidos'
-  ];
+    const vistasPrivadasUsuario = [
+      'carrito',
+      'favoritos',
+      'configuracion',
+      'crear',
+      'editar'
+    ];
 
-  if ([...vistasPrivadas, ...vistasAdmin].includes(vista) && !this.logueado) {
-    this.vista = 'login';
-    return;
+    const vistasAdmin = [
+      'admin-productos',
+      'admin-crear-producto',
+      'admin-editar-producto',
+      'admin-usuarios',
+      'admin-pedidos'
+    ];
+
+    if (vistasPublicas.includes(vista)) {
+      this.vista = vista;
+      sessionStorage.setItem('vistaActual', vista);
+      return;
+    }
+
+    if (vistasPrivadasUsuario.includes(vista) && !this.logueado) {
+      this.vista = 'login';
+      sessionStorage.setItem('vistaActual', 'login');
+      return;
+    }
+
+    if (vistasAdmin.includes(vista) && !this.esAdmin()) {
+      this.vista = this.logueado ? 'dashboard' : 'login';
+      sessionStorage.setItem('vistaActual', this.vista);
+      return;
+    }
+
+    this.vista = vista;
+    sessionStorage.setItem('vistaActual', vista);
   }
 
-  if (vistasAdmin.includes(vista) && !this.esAdmin()) {
-    this.vista = 'dashboard';
-    return;
-  }
-
-  this.vista = vista;
+  irADetalleProducto(producto: any): void {
+  this.productoSeleccionado = { ...producto };
+  this.vista = 'detalle-producto';
+  sessionStorage.setItem('vistaActual', 'detalle-producto');
 }
 
   iniciarSesion(): void {
@@ -213,27 +249,45 @@ export class AppComponent {
     }
 
     if (!this.logueado) {
-      return 'login';
+      return 'dashboard';
     }
 
-    if (this.esAdmin()) {
-      return 'admin-productos';
+    const vistaGuardada = sessionStorage.getItem('vistaActual');
+
+    if (vistaGuardada) {
+      const vistasAdmin = [
+        'admin-productos',
+        'admin-crear-producto',
+        'admin-editar-producto',
+        'admin-usuarios',
+        'admin-pedidos'
+      ];
+
+      if (vistasAdmin.includes(vistaGuardada)) {
+        return this.esAdmin() ? vistaGuardada : 'dashboard';
+      }
+
+      return vistaGuardada;
     }
 
-    return 'dashboard';
+    return this.esAdmin() ? 'admin-productos' : 'dashboard';
   }
 
   cerrarSesion(): void {
     const estabaEnVistaAdmin = this.esVistaAdmin();
 
     localStorage.clear();
+    sessionStorage.clear();
+
     this.logueado = false;
     this.productoSeleccionado = null;
 
     if (estabaEnVistaAdmin) {
       this.vista = 'admin-login';
+      sessionStorage.setItem('vistaActual', 'admin-login');
     } else {
       this.vista = 'login';
+      sessionStorage.setItem('vistaActual', 'login');
     }
   }
 
@@ -271,6 +325,7 @@ export class AppComponent {
   iniciarSesionUsuario(): void {
     this.logueado = true;
     this.vista = 'dashboard';
+    sessionStorage.setItem('vistaActual', 'dashboard');
 
     this.mensajeLogin = '✔ Inicio de sesión correcto';
 
@@ -284,8 +339,10 @@ export class AppComponent {
 
     if (this.esAdmin()) {
       this.vista = 'admin-productos';
+      sessionStorage.setItem('vistaActual', 'admin-productos');
     } else {
       this.vista = 'admin-login';
+      sessionStorage.setItem('vistaActual', 'admin-login');
     }
 
     this.mensajeLogin = '✔ Inicio de sesión administrador correcto';

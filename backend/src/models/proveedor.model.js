@@ -2,22 +2,23 @@ const mongoose = require("mongoose");
 
 const proveedorSchema = new mongoose.Schema(
   {
-    nombre: {
+    ProveedorID: {
+      type: Number,
+      required: true,
+      unique: true
+    },
+    Nombre: {
       type: String,
       required: true,
       trim: true
     },
-    telefono: {
+    Contacto: {
       type: String,
       default: ""
     },
-    correo: {
+    Correo: {
       type: String,
       default: ""
-    },
-    estado: {
-      type: Boolean,
-      default: true
     }
   },
   {

@@ -38,11 +38,7 @@
       </div>
 
       <div class="col-lg-6 text-center">
-        <img
-          src="assets/img/EasyCommerce.png"
-          class="img-fluid hero-img"
-          alt="Hero illustration"
-        >
+        <img src="assets/img/EasyCommerce.png" class="img-fluid hero-img" alt="Hero illustration">
       </div>
 
     </div>
@@ -60,17 +56,9 @@
     </p>
 
     <div class="row justify-content-center">
-      <div
-        class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4"
-        *ngFor="let producto of laptopsNuevas"
-      >
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4" *ngFor="let producto of laptopsNuevas">
         <div class="card card-producto shadow-sm">
-          <img
-            [src]="obtenerImagen(producto)"
-            class="card-img-top"
-            [alt]="obtenerNombre(producto)"
-          >
-
+          <img [src]="obtenerImagen(producto)" class="card-img-top" [alt]="obtenerNombre(producto)">
           <div class="card-body">
             <h5 class="card-title">{{ obtenerNombre(producto) }}</h5>
 
@@ -81,8 +69,7 @@
             <p class="fw-bold mt-2">
               ${{ obtenerPrecio(producto) }}
             </p>
-
-            <button class="btn btn-outline-dark rounded-pill mt-2" (click)="verProductos()">
+            <button class="btn btn-outline-dark rounded-pill mt-2" (click)="verDetalle(producto)">
               Ver producto
             </button>
           </div>
@@ -91,7 +78,7 @@
     </div>
 
     <div class="mt-3">
-      <button class="btn btn-outline-dark rounded-pill px-4" (click)="verProductos()">
+      <button class="btn btn-outline-dark rounded-pill px-4" (click)="verTodosLaptops()">
         Ver todos
       </button>
     </div>
@@ -106,17 +93,9 @@
     <h2 class="fw-bold mb-4">Productos de Asus</h2>
 
     <div class="row justify-content-center">
-      <div
-        class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4"
-        *ngFor="let producto of productosAsus"
-      >
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4" *ngFor="let producto of productosAsus">
         <div class="card card-producto shadow-sm">
-          <img
-            [src]="obtenerImagen(producto)"
-            class="card-img-top"
-            [alt]="obtenerNombre(producto)"
-          >
-
+          <img [src]="obtenerImagen(producto)" class="card-img-top" [alt]="obtenerNombre(producto)">
           <div class="card-body">
             <h5 class="card-title">{{ obtenerNombre(producto) }}</h5>
 
@@ -127,8 +106,7 @@
             <p class="fw-bold mt-2">
               ${{ obtenerPrecio(producto) }}
             </p>
-
-            <button class="btn btn-outline-dark rounded-pill mt-2" (click)="verProductos()">
+            <button class="btn btn-outline-dark rounded-pill mt-2" (click)="verDetalle(producto)">
               Ver producto
             </button>
           </div>
@@ -137,7 +115,7 @@
     </div>
 
     <div class="mt-3">
-      <button class="btn btn-outline-dark rounded-pill px-4" (click)="verProductos()">
+      <button class="btn btn-outline-dark rounded-pill px-4" (click)="verTodosAsus()">
         Ver todos
       </button>
     </div>
@@ -214,10 +192,8 @@
             "La página es fácil de usar, los productos cargan correctamente
             y pude revisar la información antes de iniciar sesión."
           </p>
-
         </div>
       </div>
-
     </div>
   </div>
 </section>

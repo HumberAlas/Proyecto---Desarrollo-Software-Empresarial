@@ -1,114 +1,86 @@
 const express = require("express");
+
 const Producto = require("../models/producto.model");
+const Categoria = require("../models/categoria.model");
+const Marca = require("../models/marca.model");
+const Proveedor = require("../models/proveedor.model");
+const ImagenProducto = require("../models/imagenProducto.model");
 const verificarToken = require("../middleware/auth.middleware");
 const verificarAdmin = require("../middleware/admin.middleware");
 const validarIpPermitida = require("../middleware/ip.middleware");
 
 const router = express.Router();
 
-function mapProducto(producto) {
+async function mapearProducto(producto) {
+  const categoria = await Categoria.findOne({ CategoriaID: producto.CategoriaID });
+  const marca = await Marca.findOne({ MarcaID: producto.MarcaID });
+  const proveedor = await Proveedor.findOne({ ProveedorID: producto.ProveedorID });
+
+  const imagenPrincipal = await ImagenProducto.findOne({
+    ProductoID: producto.ProductoID,
+    EsPrincipal: true
+  });
+
   return {
-    productoId: producto._id,
-    ProductoId: producto._id,
-    nombre: producto.nombre,
-    Nombre: producto.nombre,
-    descripcion: producto.descripcion,
-    Descripcion: producto.descripcion,
-    precio: producto.precio,
-    Precio: producto.precio,
-    stock: producto.stock,
-    Stock: producto.stock,
-    categoriaId: producto.categoriaId,
-    CategoriaId: producto.categoriaId,
-    marcaId: producto.marcaId,
-    MarcaId: producto.marcaId,
-    proveedorId: producto.proveedorId,
-    ProveedorId: producto.proveedorId,
-    imagen: producto.imagen,
-    Imagen: producto.imagen,
-    estado: producto.estado,
-    Estado: producto.estado
+    _id: producto._id,
+    ProductoID: producto.ProductoID,
+    Nombre: producto.Nombre,
+    Precio: producto.Precio,
+    Stock: producto.Stock,
+    CategoriaID: producto.CategoriaID,
+    Categoria: categoria ? categoria.Nombre : "",
+    MarcaID: producto.MarcaID,
+    Marca: marca ? marca.Nombre : "",
+    ProveedorID: producto.ProveedorID,
+    Proveedor: proveedor ? proveedor.Nombre : "",
+    SKU: producto.SKU,
+    Descripcion: producto.Descripcion,
+    Estado: producto.Estado,
+    Imagen: imagenPrincipal ? imagenPrincipal.UrlImagen : producto.Imagen
   };
 }
 
-// GET moderno
-router.get("/", async (req, res) => {
-  try {
-    const productos = await Producto.find({ estado: true });
-
-    res.json({
-      mensaje: "Listado de productos obtenido correctamente",
-      total: productos.length,
-      data: productos
-    });
-  } catch (error) {
-    res.status(500).json({
-      mensaje: "Error al obtener productos",
-      error: error.message
-    });
-  }
-});
-
-// GET compatible con backend anterior
 router.get("/ObtenerTodos", async (req, res) => {
   try {
-    const productos = await Producto.find({ estado: true });
-    res.json(productos.map(mapProducto));
-  } catch (error) {
-    res.status(500).json({
-      mensaje: "Error al obtener productos",
-      error: error.message
-    });
-  }
-});
+    const productos = await Producto.find().sort({ ProductoID: 1 });
 
-// GET con imagen principal compatible
-router.get("/conImagenPrincipal", async (req, res) => {
-  try {
-    const productos = await Producto.find({ estado: true });
-    res.json(productos.map(mapProducto));
-  } catch (error) {
-    res.status(500).json({
-      mensaje: "Error al obtener productos",
-      error: error.message
-    });
-  }
-});
-
-// GET por ID compatible
-router.get("/ObtenerporId/:id", async (req, res) => {
-  try {
-    const producto = await Producto.findById(req.params.id);
-
-    if (!producto) {
-      return res.status(404).json({
-        mensaje: "Producto no encontrado"
-      });
-    }
-
-    res.json(mapProducto(producto));
-  } catch (error) {
-    res.status(500).json({
-      mensaje: "Error al obtener producto",
-      error: error.message
-    });
-  }
-});
-
-// GET moderno por ID
-router.get("/:id", async (req, res) => {
-  try {
-    const producto = await Producto.findById(req.params.id);
-
-    if (!producto) {
-      return res.status(404).json({
-        mensaje: "Producto no encontrado"
-      });
-    }
+    const productosMapeados = await Promise.all(
+      productos.map((producto) => mapearProducto(producto))
+    );
 
     res.json({
-      mensaje: "Producto encontrado correctamente",
-      data: producto
+      mensaje: "Productos obtenidos correctamente",
+      total: productosMapeados.length,
+      data: productosMapeados
+    });
+  } catch (error) {
+    res.status(500).json({
+      mensaje: "Error al obtener productos",
+      error: error.message
+    });
+  }
+});
+
+router.get("/ObtenerporId/:id", async (req, res) => {
+  try {
+    const producto = await Producto.findOne({
+      $or: [
+        { _id: req.params.id.match(/^[0-9a-fA-F]{24}$/) ? req.params.id : null },
+        { ProductoID: Number(req.params.id) }
+      ]
+    });
+
+    if (!producto) {
+      return res.status(404).json({
+        mensaje: "Producto no encontrado"
+      });
+    }
+
+    const productoMapeado = await mapearProducto(producto);
+
+    res.json({
+      mensaje: "Producto obtenido correctamente",
+      data: productoMapeado
     });
   } catch (error) {
     res.status(500).json({
@@ -118,56 +90,38 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// POST compatible con frontend anterior
-router.post("/InsertarProducto", verificarToken, async (req, res) => {
-  try {
-    const producto = await Producto.create({
-      nombre: req.body.nombre || req.body.Nombre,
-      descripcion: req.body.descripcion || req.body.Descripcion || "",
-      precio: req.body.precio || req.body.Precio,
-      stock: req.body.stock || req.body.Stock,
-      categoriaId: req.body.categoriaId || req.body.CategoriaId,
-      marcaId: req.body.marcaId || req.body.MarcaId,
-      proveedorId: req.body.proveedorId || req.body.ProveedorId,
-      imagen: req.body.imagen || req.body.Imagen || "",
-      estado: true
-    });
-
-    res.status(201).json({
-      mensaje: "Producto insertado",
-      data: mapProducto(producto)
-    });
-  } catch (error) {
-    res.status(500).json({
-      mensaje: "Error al insertar producto",
-      error: error.message
-    });
-  }
-});
-
-// POST compatible con RegistrarConImagenes, sin manejo real de archivo todavía
 router.post(
-  "/RegistrarConImagenes",
+  "/InsertarProducto",
   validarIpPermitida,
   verificarToken,
   verificarAdmin,
   async (req, res) => {
     try {
+      const ultimoProducto = await Producto.findOne().sort({ ProductoID: -1 });
+      const nuevoProductoID = ultimoProducto ? ultimoProducto.ProductoID + 1 : 1;
+
       const producto = await Producto.create({
-        nombre: req.body.nombre || req.body.Nombre,
-        descripcion: req.body.descripcion || req.body.Descripcion || "",
-        precio: req.body.precio || req.body.Precio,
-        stock: req.body.stock || req.body.Stock,
-        categoriaId: req.body.categoriaId || req.body.CategoriaId,
-        marcaId: req.body.marcaId || req.body.MarcaId,
-        proveedorId: req.body.proveedorId || req.body.ProveedorId,
-        imagen: req.body.imagen || req.body.Imagen || "",
-        estado: true
+        ProductoID: nuevoProductoID,
+        Nombre: req.body.Nombre || req.body.nombre,
+        Precio: Number(req.body.Precio || req.body.precio),
+        Stock: Number(req.body.Stock || req.body.stock),
+        CategoriaID: Number(req.body.CategoriaID || req.body.categoriaId),
+        SKU: req.body.SKU || req.body.sku || `PRD-${Date.now()}`,
+        Descripcion: req.body.Descripcion || req.body.descripcion || "",
+        MarcaID: Number(req.body.MarcaID || req.body.marcaId),
+        ProveedorID: Number(req.body.ProveedorID || req.body.proveedorId),
+        Estado:
+          req.body.Estado !== undefined
+            ? req.body.Estado
+            : req.body.estado !== undefined
+              ? req.body.estado
+              : true,
+        Imagen: req.body.Imagen || req.body.imagen || ""
       });
 
       res.status(201).json({
-        mensaje: "Producto guardado correctamente",
-        data: mapProducto(producto)
+        mensaje: "Producto registrado correctamente",
+        data: producto
       });
     } catch (error) {
       res.status(500).json({
@@ -178,7 +132,48 @@ router.post(
   }
 );
 
-// PUT compatible
+router.post(
+  "/RegistrarConImagenes",
+  validarIpPermitida,
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const ultimoProducto = await Producto.findOne().sort({ ProductoID: -1 });
+      const nuevoProductoID = ultimoProducto ? ultimoProducto.ProductoID + 1 : 1;
+
+      const producto = await Producto.create({
+        ProductoID: nuevoProductoID,
+        Nombre: req.body.Nombre || req.body.nombre,
+        Precio: Number(req.body.Precio || req.body.precio),
+        Stock: Number(req.body.Stock || req.body.stock),
+        CategoriaID: Number(req.body.CategoriaID || req.body.categoriaId),
+        SKU: req.body.SKU || req.body.sku || `PRD-${Date.now()}`,
+        Descripcion: req.body.Descripcion || req.body.descripcion || "",
+        MarcaID: Number(req.body.MarcaID || req.body.marcaId),
+        ProveedorID: Number(req.body.ProveedorID || req.body.proveedorId),
+        Estado:
+          req.body.Estado !== undefined
+            ? req.body.Estado
+            : req.body.estado !== undefined
+              ? req.body.estado
+              : true,
+        Imagen: req.body.Imagen || req.body.imagen || ""
+      });
+
+      res.status(201).json({
+        mensaje: "Producto registrado correctamente",
+        data: producto
+      });
+    } catch (error) {
+      res.status(500).json({
+        mensaje: "Error al registrar producto",
+        error: error.message
+      });
+    }
+  }
+);
+
 router.put(
   "/ActualizarProducto",
   validarIpPermitida,
@@ -186,19 +181,34 @@ router.put(
   verificarAdmin,
   async (req, res) => {
     try {
-      const id = req.body.productoId || req.body.ProductoId || req.body._id;
+      const id =
+        req.body.ProductoID ||
+        req.body.productoId ||
+        req.body._id ||
+        req.body.id;
 
-      const producto = await Producto.findByIdAndUpdate(
-        id,
+      const filtro = String(id).match(/^[0-9a-fA-F]{24}$/)
+        ? { _id: id }
+        : { ProductoID: Number(id) };
+
+      const producto = await Producto.findOneAndUpdate(
+        filtro,
         {
-          nombre: req.body.nombre || req.body.Nombre,
-          descripcion: req.body.descripcion || req.body.Descripcion || "",
-          precio: req.body.precio || req.body.Precio,
-          stock: req.body.stock || req.body.Stock,
-          categoriaId: req.body.categoriaId || req.body.CategoriaId,
-          marcaId: req.body.marcaId || req.body.MarcaId,
-          proveedorId: req.body.proveedorId || req.body.ProveedorId,
-          imagen: req.body.imagen || req.body.Imagen || ""
+          Nombre: req.body.Nombre || req.body.nombre,
+          Precio: Number(req.body.Precio || req.body.precio),
+          Stock: Number(req.body.Stock || req.body.stock),
+          CategoriaID: Number(req.body.CategoriaID || req.body.categoriaId),
+          SKU: req.body.SKU || req.body.sku,
+          Descripcion: req.body.Descripcion || req.body.descripcion || "",
+          MarcaID: Number(req.body.MarcaID || req.body.marcaId),
+          ProveedorID: Number(req.body.ProveedorID || req.body.proveedorId),
+          Estado:
+            req.body.Estado !== undefined
+              ? req.body.Estado
+              : req.body.estado !== undefined
+                ? req.body.estado
+                : true,
+          Imagen: req.body.Imagen || req.body.imagen || ""
         },
         { new: true }
       );
@@ -210,8 +220,8 @@ router.put(
       }
 
       res.json({
-        mensaje: "Producto actualizado",
-        data: mapProducto(producto)
+        mensaje: "Producto actualizado correctamente",
+        data: producto
       });
     } catch (error) {
       res.status(500).json({
@@ -222,7 +232,6 @@ router.put(
   }
 );
 
-// DELETE compatible
 router.delete(
   "/EliminarporId/:id",
   validarIpPermitida,
@@ -230,9 +239,15 @@ router.delete(
   verificarAdmin,
   async (req, res) => {
     try {
-      const producto = await Producto.findByIdAndUpdate(
-        req.params.id,
-        { estado: false },
+      const id = req.params.id;
+
+      const filtro = String(id).match(/^[0-9a-fA-F]{24}$/)
+        ? { _id: id }
+        : { ProductoID: Number(id) };
+
+      const producto = await Producto.findOneAndUpdate(
+        filtro,
+        { Estado: false },
         { new: true }
       );
 
@@ -243,7 +258,8 @@ router.delete(
       }
 
       res.json({
-        mensaje: "Producto eliminado"
+        mensaje: "Producto desactivado correctamente",
+        data: producto
       });
     } catch (error) {
       res.status(500).json({

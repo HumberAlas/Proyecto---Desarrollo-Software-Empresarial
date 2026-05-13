@@ -2,18 +2,19 @@ const mongoose = require("mongoose");
 
 const categoriaSchema = new mongoose.Schema(
   {
-    nombre: {
+    CategoriaID: {
+      type: Number,
+      required: true,
+      unique: true
+    },
+    Nombre: {
       type: String,
       required: true,
       trim: true
     },
-    descripcion: {
+    Descripcion: {
       type: String,
       default: ""
-    },
-    estado: {
-      type: Boolean,
-      default: true
     }
   },
   {

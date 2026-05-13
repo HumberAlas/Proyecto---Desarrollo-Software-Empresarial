@@ -1,6 +1,29 @@
-import { Component, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UsuarioService } from '../../../services/usuario.service';
+import { ProductoService } from '../../../services/producto.service';
+import { MetodoPagoService } from '../../../services/metodo-pago.service';
+
+interface PedidoUsuario {
+  carritoId: string | number;
+  productoId: string | number;
+  nombre: string;
+  imagen: string;
+  cantidad: number;
+  precioUnitario: number;
+  estado: string;
+  fechaCompra: string | null;
+}
+
+interface MetodoPago {
+  _id?: string;
+  MetodoPagoID?: number;
+  TipoTarjeta: string;
+  Titular: string;
+  UltimosDigitos: string;
+  Expiracion: string;
+}
 
 @Component({
   selector: 'app-configuracion',
@@ -9,127 +32,356 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './configuracion.html',
   styleUrl: './configuracion.css'
 })
-export class ConfiguracionComponent {
-  @Input() cerrarSesion!: () => void;
-
+export class ConfiguracionComponent implements OnInit {
   seccionActiva: 'cuenta' | 'pedidos' | 'historial' | 'pagos' = 'cuenta';
 
+  usuarioId = localStorage.getItem('usuarioId') || '';
+
   usuario = {
-    correo: localStorage.getItem('correo') || 'usuario@easycommerce.com',
-    nombre: localStorage.getItem('nombreUsuario') || 'Usuario',
-    direccion: 'Chalatenango, El Salvador',
-    contacto: '7000-0000'
+    nombre: '',
+    correo: '',
+    direccion: '',
+    contacto: ''
   };
 
-  cambioPasswordVisible = false;
+  passwordActual = '';
+  nuevaPassword = '';
+  confirmarPassword = '';
+  mostrarCambioPassword = false;
 
-  password = {
-    actual: '',
-    nueva: '',
-    confirmar: ''
+  pedidosActivos: PedidoUsuario[] = [];
+  historialPedidos: PedidoUsuario[] = [];
+  metodosPago: MetodoPago[] = [];
+
+  nuevoMetodoPago = {
+    TipoTarjeta: 'Crédito',
+    Titular: '',
+    NumeroTarjeta: '',
+    Expiracion: ''
   };
 
+  cargando = false;
   mensaje = '';
   mensajeError = '';
-  mostrarModalEliminar = false;
 
-  pedidos = [
-    {
-      id: 'PED-001',
-      fecha: '2025-05-01',
-      estado: 'En proceso',
-      total: 120.50
-    },
-    {
-      id: 'PED-002',
-      fecha: '2025-05-05',
-      estado: 'Entregado',
-      total: 89.99
-    }
-  ];
+  constructor(
+    private usuarioService: UsuarioService,
+    private productoService: ProductoService,
+    private metodoPagoService: MetodoPagoService
+  ) {}
 
-  historial = [
-    {
-      id: 'HIS-001',
-      fecha: '2025-04-20',
-      descripcion: 'Compra de periféricos',
-      total: 45.99
-    },
-    {
-      id: 'HIS-002',
-      fecha: '2025-04-28',
-      descripcion: 'Compra de accesorios',
-      total: 25.50
-    }
-  ];
-
-  seleccionarSeccion(seccion: 'cuenta' | 'pedidos' | 'historial' | 'pagos', event: Event): void {
-    event.preventDefault();
-    this.seccionActiva = seccion;
-    this.limpiarMensajes();
+  ngOnInit(): void {
+    this.cargarUsuario();
   }
 
-  mostrarCambioPassword(): void {
-    this.cambioPasswordVisible = !this.cambioPasswordVisible;
+  cambiarSeccion(seccion: 'cuenta' | 'pedidos' | 'historial' | 'pagos'): void {
+    this.seccionActiva = seccion;
+    this.limpiarMensajes();
+
+    if (seccion === 'pedidos') {
+      this.cargarPedidosActivos();
+    }
+
+    if (seccion === 'historial') {
+      this.cargarHistorialPedidos();
+    }
+
+    if (seccion === 'pagos') {
+      this.cargarMetodosPago();
+    }
+  }
+
+  cargarUsuario(): void {
+    if (!this.usuarioId) {
+      this.mensajeError = 'No se encontró el usuario en sesión.';
+      return;
+    }
+
+    this.cargando = true;
+
+    this.usuarioService.obtenerUsuarioPorId(this.usuarioId).subscribe({
+      next: (respuesta: any) => {
+        this.cargando = false;
+
+        const data = respuesta.data || respuesta;
+
+        this.usuario = {
+          nombre: data.nombre || '',
+          correo: data.correo || '',
+          direccion: data.direccion || '',
+          contacto: data.contacto || ''
+        };
+      },
+      error: (error: any) => {
+        this.cargando = false;
+        this.mensajeError = error.error?.mensaje || 'No se pudieron cargar los datos del usuario.';
+      }
+    });
   }
 
   guardarCambios(): void {
     this.limpiarMensajes();
 
-    if (!this.usuario.nombre || !this.usuario.correo) {
-      this.mensajeError = 'Nombre y correo son obligatorios.';
+    if (!this.usuario.nombre.trim()) {
+      this.mensajeError = 'El nombre no puede quedar vacío.';
       return;
     }
 
-    if (this.cambioPasswordVisible) {
-      if (!this.password.actual || !this.password.nueva || !this.password.confirmar) {
-        this.mensajeError = 'Complete todos los campos de contraseña.';
-        return;
-      }
-
-      if (this.password.nueva !== this.password.confirmar) {
-        this.mensajeError = 'La nueva contraseña y la confirmación no coinciden.';
-        return;
-      }
+    if (!this.usuario.correo.trim()) {
+      this.mensajeError = 'El correo no puede quedar vacío.';
+      return;
     }
 
-    localStorage.setItem('nombreUsuario', this.usuario.nombre);
-    localStorage.setItem('correo', this.usuario.correo);
-
-    this.mensaje = 'Cambios guardados correctamente.';
-
-    this.password = {
-      actual: '',
-      nueva: '',
-      confirmar: ''
+    const datos = {
+      UsuarioID: this.usuarioId,
+      nombre: this.usuario.nombre.trim(),
+      correo: this.usuario.correo.trim(),
+      direccion: this.usuario.direccion.trim(),
+      contacto: this.usuario.contacto.trim()
     };
 
-    this.cambioPasswordVisible = false;
+    this.usuarioService.actualizarUsuario(datos).subscribe({
+      next: (respuesta: any) => {
+        const data = respuesta.data || respuesta;
+
+        localStorage.setItem('nombreUsuario', data.nombre || this.usuario.nombre);
+        localStorage.setItem('correo', data.correo || this.usuario.correo);
+
+        this.mensaje = 'Datos actualizados correctamente.';
+      },
+      error: (error: any) => {
+        this.mensajeError = error.error?.mensaje || 'No se pudieron guardar los cambios.';
+      }
+    });
   }
 
-  abrirModalEliminar(): void {
-    this.mostrarModalEliminar = true;
-  }
+  alternarCambioPassword(): void {
+    this.mostrarCambioPassword = !this.mostrarCambioPassword;
 
-  cerrarModalEliminar(): void {
-    this.mostrarModalEliminar = false;
-  }
-
-  confirmarEliminarCuenta(): void {
-    localStorage.clear();
-    this.mostrarModalEliminar = false;
-
-    if (this.cerrarSesion) {
-      this.cerrarSesion();
+    if (!this.mostrarCambioPassword) {
+      this.limpiarCamposPassword();
     }
   }
 
-  cerrarSesionDesdeConfiguracion(event: Event): void {
-    event.preventDefault();
+  cambiarPassword(): void {
+    this.limpiarMensajes();
 
-    if (this.cerrarSesion) {
-      this.cerrarSesion();
+    if (!this.passwordActual || !this.nuevaPassword || !this.confirmarPassword) {
+      this.mensajeError = 'Debe completar todos los campos de contraseña.';
+      return;
     }
+
+    if (this.nuevaPassword !== this.confirmarPassword) {
+      this.mensajeError = 'La nueva contraseña no coincide con la confirmación.';
+      return;
+    }
+
+    if (this.nuevaPassword.length < 6) {
+      this.mensajeError = 'La nueva contraseña debe tener al menos 6 caracteres.';
+      return;
+    }
+
+    const data = {
+      UsuarioID: this.usuarioId,
+      passwordActual: this.passwordActual,
+      nuevaPassword: this.nuevaPassword
+    };
+
+    this.usuarioService.cambiarPassword(data).subscribe({
+      next: () => {
+        this.mensaje = 'Contraseña actualizada correctamente.';
+        this.limpiarCamposPassword();
+        this.mostrarCambioPassword = false;
+      },
+      error: (error: any) => {
+        this.mensajeError = error.error?.mensaje || 'No se pudo cambiar la contraseña.';
+      }
+    });
+  }
+
+  cargarPedidosActivos(): void {
+    if (!this.usuarioId) return;
+
+    this.cargando = true;
+
+    this.productoService.obtenerPedidosActivos(this.usuarioId).subscribe({
+      next: (respuesta: any) => {
+        this.cargando = false;
+
+        const datos = Array.isArray(respuesta)
+          ? respuesta
+          : respuesta.data || [];
+
+        this.pedidosActivos = datos.map((item: any) => this.mapearPedido(item));
+      },
+      error: (error: any) => {
+        this.cargando = false;
+        this.mensajeError = error.error?.mensaje || 'No se pudieron cargar los pedidos activos.';
+      }
+    });
+  }
+
+  cargarHistorialPedidos(): void {
+    if (!this.usuarioId) return;
+
+    this.cargando = true;
+
+    this.productoService.obtenerHistorialPedidos(this.usuarioId).subscribe({
+      next: (respuesta: any) => {
+        this.cargando = false;
+
+        const datos = Array.isArray(respuesta)
+          ? respuesta
+          : respuesta.data || [];
+
+        this.historialPedidos = datos.map((item: any) => this.mapearPedido(item));
+      },
+      error: (error: any) => {
+        this.cargando = false;
+        this.mensajeError = error.error?.mensaje || 'No se pudo cargar el historial.';
+      }
+    });
+  }
+
+  cargarMetodosPago(): void {
+    if (!this.usuarioId) return;
+
+    this.cargando = true;
+
+    this.metodoPagoService.obtenerMetodosPago(this.usuarioId).subscribe({
+      next: (respuesta: any) => {
+        this.cargando = false;
+
+        this.metodosPago = Array.isArray(respuesta)
+          ? respuesta
+          : respuesta.data || [];
+      },
+      error: (error: any) => {
+        this.cargando = false;
+        this.mensajeError = error.error?.mensaje || 'No se pudieron cargar los métodos de pago.';
+      }
+    });
+  }
+
+  agregarMetodoPago(): void {
+    this.limpiarMensajes();
+
+    if (
+      !this.nuevoMetodoPago.TipoTarjeta ||
+      !this.nuevoMetodoPago.Titular.trim() ||
+      !this.nuevoMetodoPago.NumeroTarjeta.trim() ||
+      !this.nuevoMetodoPago.Expiracion.trim()
+    ) {
+      this.mensajeError = 'Debe completar todos los datos de la tarjeta.';
+      return;
+    }
+
+    const numeroLimpio = this.nuevoMetodoPago.NumeroTarjeta.replace(/\s/g, '');
+
+    if (numeroLimpio.length < 12) {
+      this.mensajeError = 'El número de tarjeta no parece válido.';
+      return;
+    }
+
+    const data = {
+      UsuarioID: this.usuarioId,
+      TipoTarjeta: this.nuevoMetodoPago.TipoTarjeta,
+      Titular: this.nuevoMetodoPago.Titular.trim(),
+      NumeroTarjeta: numeroLimpio,
+      Expiracion: this.nuevoMetodoPago.Expiracion.trim()
+    };
+
+    this.metodoPagoService.agregarMetodoPago(data).subscribe({
+      next: () => {
+        this.mensaje = 'Método de pago agregado correctamente.';
+
+        this.nuevoMetodoPago = {
+          TipoTarjeta: 'Crédito',
+          Titular: '',
+          NumeroTarjeta: '',
+          Expiracion: ''
+        };
+
+        this.cargarMetodosPago();
+      },
+      error: (error: any) => {
+        this.mensajeError = error.error?.mensaje || 'No se pudo agregar el método de pago.';
+      }
+    });
+  }
+
+  eliminarMetodoPago(metodo: MetodoPago): void {
+    const id = metodo.MetodoPagoID || metodo._id;
+
+    if (!id) {
+      this.mensajeError = 'No se encontró el ID del método de pago.';
+      return;
+    }
+
+    const confirmar = confirm('¿Deseas eliminar este método de pago?');
+
+    if (!confirmar) return;
+
+    this.metodoPagoService.eliminarMetodoPago(id).subscribe({
+      next: () => {
+        this.mensaje = 'Método de pago eliminado correctamente.';
+        this.cargarMetodosPago();
+      },
+      error: (error: any) => {
+        this.mensajeError = error.error?.mensaje || 'No se pudo eliminar el método de pago.';
+      }
+    });
+  }
+
+  mapearPedido(item: any): PedidoUsuario {
+    return {
+      carritoId: item.CarritoID || item.carritoId || item._id,
+      productoId: item.ProductoID || item.productoId || '',
+      nombre: item.NombreProducto || item.nombreProducto || 'Producto sin nombre',
+      imagen: this.normalizarImagen(item.Imagen || item.imagen || ''),
+      cantidad: Number(item.Cantidad || item.cantidad || 1),
+      precioUnitario: Number(item.PrecioUnitario || item.precioUnitario || 0),
+      estado: item.EstadoProducto || item.estadoProducto || 'Sin estado',
+      fechaCompra: item.FechaCompra || item.fechaCompra || null
+    };
+  }
+
+  normalizarImagen(imagen: string): string {
+    if (!imagen) {
+      return 'assets/img/EasyCommerce.png';
+    }
+
+    if (imagen.startsWith('http')) {
+      return imagen;
+    }
+
+    if (imagen.startsWith('data:image')) {
+      return imagen;
+    }
+
+    if (imagen.startsWith('assets/')) {
+      return imagen;
+    }
+
+    if (imagen.startsWith('/')) {
+      return `http://localhost:3000${imagen}`;
+    }
+
+    return imagen;
+  }
+
+  formatearFecha(fecha: string | null): string {
+    if (!fecha) {
+      return 'Sin fecha';
+    }
+
+    return new Date(fecha).toLocaleDateString('es-SV');
+  }
+
+  limpiarCamposPassword(): void {
+    this.passwordActual = '';
+    this.nuevaPassword = '';
+    this.confirmarPassword = '';
   }
 
   limpiarMensajes(): void {

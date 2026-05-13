@@ -190,4 +190,103 @@ router.post("/AutenticarAdministrador", validarIpPermitida, async (req, res) => 
   }
 });
 
+router.get("/ObtenerUsuarioPorId/:id", verificarToken, async (req, res) => {
+  try {
+    const usuario = await Usuario.findById(req.params.id).select("-password");
+
+    if (!usuario) {
+      return res.status(404).json({
+        mensaje: "Usuario no encontrado."
+      });
+    }
+
+    res.json({
+      mensaje: "Usuario obtenido correctamente.",
+      data: usuario
+    });
+  } catch (error) {
+    res.status(500).json({
+      mensaje: "Error al obtener usuario.",
+      error: error.message
+    });
+  }
+});
+
+router.put("/ActualizarUsuario", verificarToken, async (req, res) => {
+  try {
+    const usuarioId = req.body.UsuarioID || req.body.usuarioId || req.usuario.id;
+
+    const usuario = await Usuario.findByIdAndUpdate(
+      usuarioId,
+      {
+        nombre: req.body.nombre,
+        correo: req.body.correo,
+        direccion: req.body.direccion,
+        contacto: req.body.contacto
+      },
+      { new: true }
+    ).select("-password");
+
+    if (!usuario) {
+      return res.status(404).json({
+        mensaje: "Usuario no encontrado."
+      });
+    }
+
+    res.json({
+      mensaje: "Usuario actualizado correctamente.",
+      data: usuario
+    });
+  } catch (error) {
+    res.status(500).json({
+      mensaje: "Error al actualizar usuario.",
+      error: error.message
+    });
+  }
+});
+
+router.put("/CambiarPassword", verificarToken, async (req, res) => {
+  try {
+    const bcrypt = require("bcryptjs");
+
+    const usuarioId = req.body.UsuarioID || req.body.usuarioId || req.usuario.id;
+    const passwordActual = req.body.passwordActual;
+    const nuevaPassword = req.body.nuevaPassword;
+
+    if (!passwordActual || !nuevaPassword) {
+      return res.status(400).json({
+        mensaje: "Debe ingresar la contraseña actual y la nueva contraseña."
+      });
+    }
+
+    const usuario = await Usuario.findById(usuarioId);
+
+    if (!usuario) {
+      return res.status(404).json({
+        mensaje: "Usuario no encontrado."
+      });
+    }
+
+    const passwordValida = await bcrypt.compare(passwordActual, usuario.password);
+
+    if (!passwordValida) {
+      return res.status(401).json({
+        mensaje: "La contraseña actual es incorrecta."
+      });
+    }
+
+    usuario.password = await bcrypt.hash(nuevaPassword, 10);
+    await usuario.save();
+
+    res.json({
+      mensaje: "Contraseña actualizada correctamente."
+    });
+  } catch (error) {
+    res.status(500).json({
+      mensaje: "Error al cambiar contraseña.",
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

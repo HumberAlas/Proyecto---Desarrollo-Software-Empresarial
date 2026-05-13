@@ -9,11 +9,21 @@ const productosRoutes = require("./routes/productos.routes");
 const categoriasRoutes = require("./routes/categorias.routes");
 const usuariosRoutes = require("./routes/usuarios.routes");
 const auxiliaresRoutes = require("./routes/auxiliares.routes");
+const carritoRoutes = require("./routes/carrito.routes");
+const imagenesProductoRoutes = require("./routes/imagenesProducto.routes");
+const favoritosRoutes = require("./routes/favoritos.routes");
+const metodosPagoRoutes = require("./routes/metodosPago.routes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 conectarDB();
+
+const seedInicial = require("./seed/seedInicial");
+
+conectarDB().then(() => {
+  seedInicial();
+});
 
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
@@ -44,7 +54,11 @@ app.use("/auth", authRoutes);
 app.use("/productos", productosRoutes);
 app.use("/categorias", categoriasRoutes);
 app.use("/usuarios", usuariosRoutes);
+app.use("/carrito", carritoRoutes);
 app.use("/auxiliares", auxiliaresRoutes);
+app.use("/imagenesProducto", imagenesProductoRoutes);
+app.use("/favoritos", favoritosRoutes);
+app.use("/metodosPago", metodosPagoRoutes);
 
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en http://localhost:${PORT}`);

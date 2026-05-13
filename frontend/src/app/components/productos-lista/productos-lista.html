@@ -3,8 +3,11 @@
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item">
-        <button class="breadcrumb-link">Inicio</button>
+        <button class="breadcrumb-link" type="button" (click)="cambiarVista('dashboard')">
+          Inicio
+        </button>
       </li>
+
       <li class="breadcrumb-item active" aria-current="page">
         Productos
       </li>
@@ -15,26 +18,32 @@
 <!-- Productos -->
 <section class="productos py-5">
   <div class="container">
-
     <div class="row">
 
       <!-- Sidebar de filtros -->
       <aside class="col-md-3 mb-4">
-
         <div class="filtros-box shadow-sm p-4">
 
           <h5 class="fw-bold mb-4">
-            <i class="fa fa-filter me-2"></i>Filtros
+            <i class="fa fa-filter me-2"></i>
+            Filtros
           </h5>
 
+          <!-- Buscador -->
+          <div class="mb-4">
+            <h6 class="fw-bold">Buscar</h6>
+
+            <input type="text" class="form-control" placeholder="Buscar producto..." [(ngModel)]="busqueda"
+              (keyup.enter)="aplicarFiltros()">
+          </div>
           <!-- Filtro por Categoría -->
           <div class="mb-4">
             <h6 class="fw-bold">Categoría</h6>
-
-            <select class="form-select" [(ngModel)]="filtroCategoria">
+            <select class="form-select" [(ngModel)]="filtroCategoria" (change)="alCambiarCategoria()">
               <option value="">Todas</option>
-              <option *ngFor="let categoria of categorias" [value]="categoria">
-                {{ categoria }}
+
+              <option *ngFor="let categoria of categoriasDisponibles" [value]="obtenerCategoriaValor(categoria)">
+                {{ obtenerCategoriaNombre(categoria) }}
               </option>
             </select>
           </div>
@@ -42,11 +51,11 @@
           <!-- Filtro por Marca -->
           <div class="mb-4">
             <h6 class="fw-bold">Marca</h6>
-
-            <select class="form-select" [(ngModel)]="filtroMarca">
+            <select class="form-select" [(ngModel)]="filtroMarca" (change)="alCambiarMarca()">
               <option value="">Todas</option>
-              <option *ngFor="let marca of marcas" [value]="marca">
-                {{ marca }}
+
+              <option *ngFor="let marca of marcasDisponibles" [value]="obtenerMarcaValor(marca)">
+                {{ obtenerMarcaNombre(marca) }}
               </option>
             </select>
           </div>
@@ -54,48 +63,22 @@
           <!-- Filtro por Precio -->
           <div class="mb-4">
             <h6 class="fw-bold">Precio máximo</h6>
-
-            <input
-              type="range"
-              class="form-range"
-              min="40"
-              max="2000"
-              step="20"
-              [(ngModel)]="filtroPrecio"
-            >
-
+            <input type="range" class="form-range" min="40" max="2000" step="20" [(ngModel)]="filtroPrecio">
             <span class="fw-semibold">
               ${{ filtroPrecio }}
             </span>
           </div>
-
-          <!-- Filtro visual de almacenamiento -->
-          <div class="mb-4">
-            <h6 class="fw-bold">Almacenamiento</h6>
-
-            <div class="d-flex flex-wrap gap-2">
-              <span class="badge rounded-pill bg-light text-dark border">500 GB</span>
-              <span class="badge rounded-pill bg-light text-dark border">1 TB</span>
-              <span class="badge rounded-pill bg-dark text-white">2 TB</span>
-              <span class="badge rounded-pill bg-light text-dark border">4 TB</span>
-            </div>
-          </div>
-
-          <button class="btn btn-dark w-100 rounded-pill" (click)="aplicarFiltros()">
+          <button class="btn btn-dark w-100 rounded-pill" type="button" (click)="aplicarFiltros()">
             Aplicar filtros
           </button>
-
-          <button class="btn btn-outline-dark w-100 rounded-pill mt-2" (click)="eliminarFiltros()">
+          <button class="btn btn-outline-dark w-100 rounded-pill mt-2" type="button" (click)="eliminarFiltros()">
             Eliminar filtros
           </button>
-
         </div>
-
       </aside>
 
       <!-- Grid de productos -->
       <div class="col-md-9">
-
         <div class="productos-scroll-box">
 
           <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
@@ -106,118 +89,89 @@
               </p>
             </div>
           </div>
-
-          <p *ngIf="mensaje" class="text-danger">
+          <!-- Alertas -->
+          <div *ngIf="mensaje" class="alert alert-success">
             {{ mensaje }}
-          </p>
-
-          <div
-            *ngIf="productosFiltrados.length === 0 && !mensaje"
-            class="producto-empty text-muted"
-          >
-            No hay productos disponibles con los filtros seleccionados.
           </div>
 
-          <div class="row g-4">
-            <div
-              class="col-12 col-sm-6 col-lg-4"
-              *ngFor="let producto of productosPaginados"
-            >
-              <div class="card h-100 border-0 shadow-sm card-producto-publico">
+          <div *ngIf="mensajeError" class="alert alert-danger">
+            {{ mensajeError }}
+          </div>
 
-                <div class="position-relative">
-                  <img
-                    [src]="obtenerImagen(producto)"
-                    class="product-img"
-                    [alt]="obtenerNombre(producto)"
-                  >
+          <!-- Cargando -->
+          <div *ngIf="cargando" class="text-center py-5">
+            <div class="spinner-border text-dark mb-3" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
 
-                  <button
-                    class="btn-fav"
-                    (click)="agregarAFavoritos(producto)"
-                    title="Agregar a favoritos"
-                  >
-                    <i class="fa fa-heart"></i>
+            <p class="text-muted">
+              Cargando productos...
+            </p>
+          </div>
+
+          <!-- Sin productos -->
+          <div *ngIf="!cargando && productosFiltrados.length === 0" class="producto-empty text-muted">
+            No se encontraron productos con los filtros seleccionados.
+          </div>
+
+          <!-- Productos -->
+          <div class="row g-4" *ngIf="!cargando && productosPaginados.length > 0">
+            <div class="col-12 col-sm-6 col-lg-4" *ngFor="let producto of productosPaginados">
+              <div class="card-producto-simple">
+
+                <div class="producto-imagen-box">
+                  <img [src]="obtenerImagen(producto)" [alt]="obtenerNombre(producto)" class="producto-imagen"
+                    (click)="abrirDetalle(producto)">
+
+                  <button class="btn-fav-simple" type="button" (click)="agregarAFavoritos(producto)"
+                    [disabled]="estaCargandoFavorito(producto)" [class.favorito-activo]="esProductoFavorito(producto)"
+                    [title]="esProductoFavorito(producto) ? 'Quitar de favoritos' : 'Agregar a favoritos'">
+                    <i class="fa" [class.fa-solid]="esProductoFavorito(producto)"
+                      [class.fa-regular]="!esProductoFavorito(producto)" [class.fa-heart]="true"></i>
                   </button>
                 </div>
 
-                <div class="card-body d-flex flex-column">
-
-                  <h5 class="card-title fw-bold">
+                <div class="producto-info">
+                  <h5 class="producto-nombre">
                     {{ obtenerNombre(producto) }}
                   </h5>
 
-                  <p class="text-muted small flex-grow-1">
-                    {{ obtenerDescripcion(producto) }}
+                  <p class="producto-precio">
+                    ${{ obtenerPrecio(producto).toFixed(2) }}
                   </p>
 
-                  <p class="small mb-1">
-                    <strong>Categoría:</strong>
-                    {{ obtenerCategoria(producto) || 'Sin categoría' }}
-                  </p>
+                  <button class="btn btn-outline-dark w-100 rounded-pill mb-2" type="button"
+                    (click)="abrirDetalle(producto)">
+                    Ver más
+                  </button>
 
-                  <p class="small mb-1">
-                    <strong>Marca:</strong>
-                    {{ obtenerMarca(producto) || 'Sin marca' }}
-                  </p>
-
-                  <p class="small mb-2">
-                    <strong>Stock:</strong>
-                    {{ obtenerStock(producto) }}
-                  </p>
-
-                  <div class="d-flex justify-content-between align-items-center mt-2">
-                    <span class="fw-bold fs-5">
-                      ${{ obtenerPrecio(producto) }}
-                    </span>
-                  </div>
-
-                  <div class="d-flex gap-2 mt-3">
-                    <button
-                      class="btn btn-dark rounded-pill w-100"
-                      (click)="agregarAlCarrito(producto)"
-                    >
-                      <i class="fa fa-shopping-cart me-1"></i>
-                      Carrito
-                    </button>
-
-                    <button
-                      class="btn btn-outline-dark rounded-pill"
-                      (click)="editarProducto(producto)"
-                      title="Editar producto"
-                    >
-                      <i class="fa fa-pen"></i>
-                    </button>
-                  </div>
-
+                  <button class="btn btn-dark w-100 rounded-pill" type="button" (click)="agregarAlCarrito(producto)">
+                    <i class="fa fa-shopping-cart me-2"></i>
+                    Agregar al carrito
+                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Paginación -->
-          <div class="d-flex justify-content-center mt-4" *ngIf="totalPaginas > 1">
+          <div class="d-flex justify-content-center mt-4" *ngIf="!cargando && totalPaginas > 1">
             <nav>
               <ul class="pagination">
 
                 <li class="page-item" [class.disabled]="paginaActual === 1">
-                  <button class="page-link" (click)="cambiarPagina(paginaActual - 1)">
+                  <button class="page-link" type="button" (click)="cambiarPagina(paginaActual - 1)">
                     Anterior
                   </button>
                 </li>
-
-                <li
-                  class="page-item"
-                  *ngFor="let pagina of obtenerPaginas()"
-                  [class.active]="pagina === paginaActual"
-                >
-                  <button class="page-link" (click)="cambiarPagina(pagina)">
+                <li class="page-item" *ngFor="let pagina of obtenerPaginas()" [class.active]="pagina === paginaActual">
+                  <button class="page-link" type="button" (click)="cambiarPagina(pagina)">
                     {{ pagina }}
                   </button>
                 </li>
 
                 <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
-                  <button class="page-link" (click)="cambiarPagina(paginaActual + 1)">
+                  <button class="page-link" type="button" (click)="cambiarPagina(paginaActual + 1)">
                     Siguiente
                   </button>
                 </li>
@@ -227,16 +181,10 @@
           </div>
 
         </div>
-
       </div>
-
     </div>
-
   </div>
-</section>
-
-<!-- Modal para iniciar sesión -->
-<div class="modal-backdrop-custom" *ngIf="mostrarModalLogin">
+  <div class="modal-backdrop-custom" *ngIf="mostrarModalLogin">
   <div class="modal-card-login">
 
     <div class="modal-header-custom">
@@ -253,7 +201,7 @@
       <i class="fa fa-user-lock fa-3x mb-3 text-dark"></i>
 
       <p class="mb-0">
-        Para agregar productos al carrito o guardar favoritos necesitas iniciar sesión en tu cuenta.
+        Para {{ accionPendiente }} necesitas iniciar sesión en tu cuenta.
       </p>
     </div>
 
@@ -274,6 +222,6 @@
         Iniciar sesión
       </button>
     </div>
-
   </div>
 </div>
+</section>

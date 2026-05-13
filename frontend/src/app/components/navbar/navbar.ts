@@ -1,10 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { BusquedaService } from '../../../services/busqueda.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
@@ -13,9 +15,34 @@ export class NavbarComponent {
   @Input() cerrarSesion!: () => void;
   @Input() logueado!: boolean;
 
-  get nombreUsuario(): string {
-    return localStorage.getItem('nombreUsuario') || 'Usuario';
+  terminoBusqueda = '';
+
+  constructor(private busquedaService: BusquedaService) {}
+
+  buscarProducto(): void {
+    const termino = this.terminoBusqueda.trim();
+
+    this.busquedaService.establecerBusqueda(termino);
+
+    if (this.cambiarVista) {
+      this.cambiarVista('lista');
+    }
   }
+
+  limpiarBuscador(): void {
+    this.terminoBusqueda = '';
+    this.busquedaService.limpiarBusqueda();
+
+    if (this.cambiarVista) {
+      this.cambiarVista('lista');
+    }
+  }
+
+  nombreUsuario = localStorage.getItem('nombreUsuario') || '';
+
+obtenerNombreUsuario(): string {
+  return localStorage.getItem('nombreUsuario') || this.nombreUsuario || 'Usuario';
+}
 
   irADashboard(event: Event): void {
     event.preventDefault();
@@ -55,6 +82,14 @@ irAFavoritos(event: Event): void {
 irAConfiguracion(event: Event): void {
   event.preventDefault();
   this.cambiarVista('configuracion');
+}
+
+irALogin(event?: Event): void {
+  if (event) {
+    event.preventDefault();
+  }
+
+  this.cambiarVista('login');
 }
 
   logout(event: Event): void {
