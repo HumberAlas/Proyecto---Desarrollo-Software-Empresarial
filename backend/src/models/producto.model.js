@@ -2,29 +2,55 @@ const mongoose = require("mongoose");
 
 const productoSchema = new mongoose.Schema(
   {
-    nombre: {
+    ProductoID: {
+      type: Number,
+      required: true,
+      unique: true
+    },
+    Nombre: {
       type: String,
       required: true,
       trim: true
     },
-    precio: {
+    Precio: {
       type: Number,
       required: true,
       min: 0
     },
-    stock: {
+    Stock: {
       type: Number,
       required: true,
-      min: 0,
-      validate: {
-        validator: Number.isInteger,
-        message: "El stock debe ser un número entero"
-      }
+      min: 0
     },
-    categoria: {
+    CategoriaID: {
+      type: Number,
+      required: true
+    },
+    SKU: {
       type: String,
       required: true,
+      unique: true,
       trim: true
+    },
+    Descripcion: {
+      type: String,
+      default: ""
+    },
+    MarcaID: {
+      type: Number,
+      required: true
+    },
+    ProveedorID: {
+      type: Number,
+      required: true
+    },
+    Estado: {
+      type: Boolean,
+      default: true
+    },
+    Imagen: {
+      type: String,
+      default: ""
     }
   },
   {

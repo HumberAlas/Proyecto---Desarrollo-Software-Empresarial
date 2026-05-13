@@ -17,9 +17,17 @@
             "main": "src/main.ts",
             "polyfills": [],
             "tsConfig": "tsconfig.app.json",
-            "assets": [],
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
+              }
+            ],
             "styles": [
-              "src/styles.css"
+              "src/styles/styles.css",
+              "src/styles/stylelogin.css",
+              "src/styles/styleindexadmin.css"
             ],
             "scripts": []
           },
