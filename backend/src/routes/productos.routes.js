@@ -5,7 +5,10 @@ const Categoria = require("../models/categoria.model");
 const Marca = require("../models/marca.model");
 const Proveedor = require("../models/proveedor.model");
 const ImagenProducto = require("../models/imagenProducto.model");
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 const verificarToken = require("../middleware/auth.middleware");
 const verificarAdmin = require("../middleware/admin.middleware");
 const validarIpPermitida = require("../middleware/ip.middleware");

@@ -9,6 +9,10 @@
   background-color: #f5f6f8;
 }
 
+<<<<<<< HEAD
+=======
+/* Barra lateral */
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 .sidebar {
   width: 250px;
   background-color: #212529;
@@ -39,12 +43,17 @@
   color: #212529;
 }
 
+<<<<<<< HEAD
+=======
+/* Contenido */
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 .content {
   margin-left: 250px;
   width: calc(100% - 250px);
   padding: 32px;
 }
 
+<<<<<<< HEAD
 .empty-box {
   background: #ffffff;
   border-radius: 16px;
@@ -182,6 +191,81 @@
   min-width: 210px;
   display: flex;
   justify-content: flex-end;
+=======
+.accordion-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.usuario-pedidos-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.usuario-header {
+  width: 100%;
+  border: none;
+  background-color: #ffffff;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+}
+
+.usuario-header:hover {
+  background-color: #f8f9fa;
+}
+
+.usuario-resumen {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.usuario-body {
+  border-top: 1px solid #eeeeee;
+  padding: 18px;
+  background-color: #fafafa;
+}
+
+.pedido-card {
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 16px;
+  border-left: 5px solid #6c757d;
+}
+
+.pedido-card:last-child {
+  margin-bottom: 0;
+}
+
+.pedido-entregado {
+  background-color: #e2e3e5 !important;
+  border-left: 5px solid #198754;
+}
+
+.table-productos-pedido {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 8px;
+  border: 1px solid #eeeeee;
+}
+
+.pedidos-empty {
+  background-color: #ffffff;
+  border-radius: 16px;
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 }
 
 @media (max-width: 992px) {
@@ -200,6 +284,7 @@
     padding: 20px;
   }
 
+<<<<<<< HEAD
   .grupo-header,
   .orden-header,
   .orden-footer {
@@ -344,4 +429,16 @@
   width: calc(100% - 78px);
   padding: 32px;
   transition: margin-left 0.25s ease, width 0.25s ease;
+=======
+  .usuario-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .usuario-resumen {
+    width: 100%;
+    justify-content: space-between;
+  }
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 }

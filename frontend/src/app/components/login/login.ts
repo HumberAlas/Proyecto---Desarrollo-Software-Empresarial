@@ -1,9 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+<<<<<<< HEAD
 import { AuthService, LoginResponse } from '../../../services/auth.service';
 
 declare const google: any;
+=======
+import { AuthService } from '../../../services/auth.service';
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 
 @Component({
   selector: 'app-login',
@@ -34,7 +38,11 @@ export class LoginComponent {
   errorPasswordMatch = false;
   mensajeRegistro = '';
 
+<<<<<<< HEAD
   constructor(private authService: AuthService) { }
+=======
+  constructor(private authService: AuthService) {}
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 
   mostrarRegistro(event: Event): void {
     event.preventDefault();
@@ -63,9 +71,13 @@ export class LoginComponent {
         localStorage.setItem('nombreUsuario', respuesta.nombre || respuesta.usuario?.nombre || '');
         localStorage.setItem('rol', respuesta.rol || respuesta.usuario?.rol || '');
 
+<<<<<<< HEAD
         localStorage.setItem('tipoLogin', 'usuario');
 
         sessionStorage.setItem('vistaActual', 'dashboard');
+=======
+        localStorage.setItem('tipoLogin', 'admin');
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 
         this.loginExitoso();
       },
@@ -75,6 +87,7 @@ export class LoginComponent {
     });
   }
 
+<<<<<<< HEAD
   ngAfterViewInit(): void {
     this.inicializarGoogleLogin();
   }
@@ -129,6 +142,8 @@ export class LoginComponent {
     });
   }
 
+=======
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
   registrarUsuario(): void {
     this.limpiarMensajes();
 

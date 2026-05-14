@@ -19,7 +19,11 @@ export interface ProductoDetalleResponse {
 export class ProductoService {
   private apiUrl = 'http://localhost:3000';
 
+<<<<<<< HEAD
   constructor(private http: HttpClient) { }
+=======
+  constructor(private http: HttpClient) {}
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token') || '';
@@ -98,7 +102,10 @@ export class ProductoService {
       { headers: this.getHeaders() }
     );
   }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
   // =========================
   // AUXILIARES
   // =========================
@@ -149,6 +156,7 @@ export class ProductoService {
     );
   }
 
+<<<<<<< HEAD
   finalizarCompra(usuarioId: string, data: any = {}): Observable<any> {
   return this.http.put(
     `${this.apiUrl}/carrito/finalizar-compra/${usuarioId}`,
@@ -156,6 +164,15 @@ export class ProductoService {
     { headers: this.getHeaders() }
   );
 }
+=======
+  finalizarCompra(usuarioId: string): Observable<any> {
+    return this.http.put(
+      `${this.apiUrl}/carrito/finalizar-compra/${usuarioId}`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 
   obtenerPedidosActivos(usuarioId: string): Observable<any> {
     return this.http.get(
@@ -187,6 +204,7 @@ export class ProductoService {
   }
 
   obtenerImagenesProducto(productoId: string | number): Observable<any> {
+<<<<<<< HEAD
     return this.http.get(
       `${this.apiUrl}/imagenesProducto/producto/${productoId}`
     );
@@ -352,5 +370,42 @@ export class ProductoService {
     );
   }
 
+=======
+  return this.http.get(
+    `${this.apiUrl}/imagenesProducto/producto/${productoId}`
+  );
+}
+
+verificarFavorito(productoId: string | number): Observable<any> {
+  return this.http.get(
+    `${this.apiUrl}/favoritos/existe/${productoId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+obtenerFavoritosUsuario(usuarioId: string): Observable<any> {
+  return this.http.get(
+    `${this.apiUrl}/favoritos/usuario/${usuarioId}`,
+    { headers: this.getHeaders() }
+  );
+}
+
+agregarFavorito(productoId: string | number): Observable<any> {
+  return this.http.post(
+    `${this.apiUrl}/favoritos/agregar`,
+    {
+      ProductoID: productoId
+    },
+    { headers: this.getHeaders() }
+  );
+}
+
+eliminarFavoritoPorProducto(productoId: string | number): Observable<any> {
+  return this.http.delete(
+    `${this.apiUrl}/favoritos/producto/${productoId}`,
+    { headers: this.getHeaders() }
+  );
+}
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 }
 

@@ -1,5 +1,6 @@
 <div class="admin-layout">
 
+<<<<<<< HEAD
   <div class="sidebar">
   <div class="sidebar-title">
     <i class="fa fa-cubes"></i>
@@ -66,12 +67,52 @@
         <h3 class="mb-1">Gestión de Usuarios</h3>
         <p class="text-muted mb-0">Administra los usuarios registrados en el sistema.</p>
       </div>
+=======
+  <!-- Barra lateral -->
+  <div class="sidebar">
+    <h4>Administración</h4>
+
+    <nav class="nav flex-column">
+      <a class="nav-link" href="#" (click)="irA('admin-productos', $event)">
+        Productos
+      </a>
+
+      <a class="nav-link active" href="#" (click)="irA('admin-usuarios', $event)">
+        Usuarios
+      </a>
+
+      <a class="nav-link" href="#" (click)="irA('admin-pedidos', $event)">
+        Pedidos
+      </a>
+
+      <a class="nav-link" href="#" (click)="logout($event)">
+        Cerrar sesión
+      </a>
+    </nav>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="mb-1">Gestión de Usuarios</h3>
+        <p class="text-muted mb-0">
+          Administra los usuarios registrados en el sistema.
+        </p>
+      </div>
+
+      <button class="btn btn-primary" (click)="abrirFormulario()">
+        Nuevo Usuario
+      </button>
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
     </div>
 
     <div *ngIf="mensaje" class="alert alert-success">
       {{ mensaje }}
     </div>
 
+<<<<<<< HEAD
     <div *ngIf="mensajeError" class="alert alert-danger">
       {{ mensajeError }}
     </div>
@@ -94,6 +135,8 @@
     </div>
 
     <!-- Tabla -->
+=======
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
     <div class="table-responsive">
       <table class="table table-bordered table-hover align-middle text-center">
         <thead class="table-dark">
@@ -109,6 +152,7 @@
         </thead>
 
         <tbody>
+<<<<<<< HEAD
           <tr *ngFor="let usuario of usuariosFiltrados">
             <td>{{ obtenerId(usuario) | slice:0:8 }}</td>
             <td>{{ obtenerNombre(usuario) }}</td>
@@ -131,6 +175,45 @@
           <tr *ngIf="usuariosFiltrados.length === 0">
             <td colspan="7" class="text-muted py-4">
               No hay usuarios para mostrar.
+=======
+          <tr *ngFor="let usuario of usuarios">
+            <td>{{ usuario.id }}</td>
+            <td>{{ usuario.nombre }}</td>
+            <td>{{ usuario.correo }}</td>
+            <td>{{ usuario.direccion || 'N/A' }}</td>
+            <td>{{ usuario.contacto || 'N/A' }}</td>
+            <td>
+              <span
+                class="badge"
+                [class.bg-dark]="usuario.rol === 'Administrador'"
+                [class.bg-secondary]="usuario.rol !== 'Administrador'"
+              >
+                {{ usuario.rol }}
+              </span>
+            </td>
+            <td>
+              <div class="d-flex justify-content-center gap-2">
+                <button
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="editarUsuario(usuario)"
+                >
+                  <i class="fa fa-pen"></i>
+                </button>
+
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="eliminarUsuario(usuario)"
+                >
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="usuarios.length === 0">
+            <td colspan="7" class="text-center text-muted py-4">
+              No hay usuarios registrados.
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
             </td>
           </tr>
         </tbody>
@@ -140,6 +223,7 @@
   </div>
 </div>
 
+<<<<<<< HEAD
 <!-- Modal editar usuario -->
 <div class="modal-backdrop-custom" *ngIf="modalAbierto">
   <div class="modal-card-custom">
@@ -212,6 +296,121 @@
         Guardar Usuario
       </button>
     </div>
+=======
+<!-- Modal para crear/editar usuario -->
+<div class="modal-backdrop-custom" *ngIf="mostrarModal">
+  <div class="modal-card">
+
+    <form (ngSubmit)="guardarUsuario()">
+      <div class="modal-header-custom">
+        <h5 class="modal-title mb-0">
+          {{ modoEdicion ? 'Editar Usuario' : 'Nuevo Usuario' }}
+        </h5>
+
+        <button type="button" class="btn-close-custom" (click)="cerrarModal()">
+          ×
+        </button>
+      </div>
+
+      <div class="modal-body-custom">
+
+        <input type="hidden" [(ngModel)]="usuarioForm.id" name="usuarioId">
+
+        <div class="mb-3">
+          <label class="form-label">Nombre</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="usuarioForm.nombre"
+            name="nombre"
+            required
+          >
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Correo</label>
+          <input
+            type="email"
+            class="form-control"
+            [(ngModel)]="usuarioForm.correo"
+            name="correo"
+            required
+          >
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Dirección</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="usuarioForm.direccion"
+            name="direccion"
+          >
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Contacto</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="usuarioForm.contacto"
+            name="contacto"
+          >
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Rol</label>
+          <select
+            class="form-select"
+            [(ngModel)]="usuarioForm.rol"
+            name="rol"
+          >
+            <option value="Cliente">Cliente</option>
+            <option value="Administrador">Administrador</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">
+            {{ modoEdicion ? 'Nueva Contraseña' : 'Contraseña' }}
+          </label>
+          <input
+            type="password"
+            class="form-control"
+            [(ngModel)]="usuarioForm.password"
+            name="password"
+            [placeholder]="modoEdicion ? 'Dejar vacío para no cambiar' : 'Ingrese contraseña'"
+          >
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Confirmar Contraseña</label>
+          <input
+            type="password"
+            class="form-control"
+            [(ngModel)]="usuarioForm.confirmarPassword"
+            name="confirmarPassword"
+            placeholder="Repetir contraseña"
+          >
+        </div>
+
+        <p *ngIf="mensajeError" class="text-danger text-center mt-2">
+          {{ mensajeError }}
+        </p>
+
+      </div>
+
+      <div class="modal-footer-custom">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+          Cancelar
+        </button>
+
+        <button type="submit" class="btn btn-primary">
+          Guardar Usuario
+        </button>
+      </div>
+    </form>
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 
   </div>
 </div>

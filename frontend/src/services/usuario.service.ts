@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -56,4 +57,49 @@ actualizarUsuarioAdmin(usuario: any): Observable<any> {
     { headers: this.getHeaders() }
   );
 }
+=======
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UsuarioService {
+  private apiUrl = 'http://localhost:3000';
+
+  constructor(private http: HttpClient) {}
+
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token') || '';
+
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+  }
+
+  obtenerUsuarioPorId(usuarioId: string): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}/usuarios/ObtenerUsuarioPorId/${usuarioId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  actualizarUsuario(usuario: any): Observable<any> {
+    return this.http.put(
+      `${this.apiUrl}/usuarios/ActualizarUsuario`,
+      usuario,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  cambiarPassword(data: any): Observable<any> {
+    return this.http.put(
+      `${this.apiUrl}/usuarios/CambiarPassword`,
+      data,
+      { headers: this.getHeaders() }
+    );
+  }
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 }

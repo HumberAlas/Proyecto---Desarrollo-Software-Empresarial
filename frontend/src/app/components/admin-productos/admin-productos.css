@@ -97,6 +97,7 @@
   .sidebar {
     position: static;
     width: 100%;
+<<<<<<< HEAD
     height: auto;
     padding: 16px;
   }
@@ -114,6 +115,8 @@
   .sidebar-nav {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+=======
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
   }
 
   .content {
@@ -121,6 +124,7 @@
     width: 100%;
     padding: 20px;
   }
+<<<<<<< HEAD
 }
 
 .stock-box {
@@ -265,4 +269,6 @@
   width: calc(100% - 78px);
   padding: 32px;
   transition: margin-left 0.25s ease, width 0.25s ease;
+=======
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 }

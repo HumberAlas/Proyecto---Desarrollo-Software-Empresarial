@@ -2,6 +2,7 @@
 
   <!-- Barra lateral -->
   <div class="sidebar">
+<<<<<<< HEAD
   <div class="sidebar-title">
     <i class="fa fa-cubes"></i>
     <span>Administración</span>
@@ -59,13 +60,40 @@
 </nav>
 </div>
 
+=======
+    <h4>Administración</h4>
+
+    <nav class="nav flex-column">
+      <a class="nav-link active" href="#" (click)="irA('admin-productos', $event)">
+        Productos
+      </a>
+
+      <a class="nav-link" href="#" (click)="irA('admin-usuarios', $event)">
+        Usuarios
+      </a>
+
+      <a class="nav-link" href="#" (click)="irA('admin-pedidos', $event)">
+        Pedidos
+      </a>
+
+      <a class="nav-link" href="#" (click)="logout($event)">
+        Cerrar sesión
+      </a>
+    </nav>
+  </div>
+
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
   <!-- Contenido principal -->
   <div class="content">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h3>Gestión de Productos</h3>
 
+<<<<<<< HEAD
       <button class="btn btn-success" (click)="nuevoProducto()">
+=======
+      <button class="btn btn-success" (click)="irA('admin-crear-producto')">
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
         Agregar Producto
       </button>
     </div>
@@ -77,7 +105,16 @@
 
         <div class="col-md-3">
           <label class="form-label fw-semibold">Buscar</label>
+<<<<<<< HEAD
           <input type="text" class="form-control" placeholder="Nombre o SKU" [(ngModel)]="buscarProducto">
+=======
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Nombre o SKU"
+            [(ngModel)]="buscarProducto"
+          >
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
         </div>
 
         <div class="col-md-2">
@@ -111,7 +148,18 @@
 
         <div class="col-md-3">
           <label class="form-label fw-semibold">Precio máximo</label>
+<<<<<<< HEAD
           <input type="range" class="form-range" min="0" max="2000" step="20" [(ngModel)]="filtroPrecio">
+=======
+          <input
+            type="range"
+            class="form-range"
+            min="0"
+            max="2000"
+            step="20"
+            [(ngModel)]="filtroPrecio"
+          >
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
           <span class="fw-semibold">${{ filtroPrecio }}</span>
         </div>
 
@@ -170,6 +218,7 @@
             <td>{{ obtenerId(producto) | slice:0:8 }}</td>
             <td>{{ obtenerNombre(producto) }}</td>
             <td>${{ obtenerPrecio(producto).toFixed(2) }}</td>
+<<<<<<< HEAD
             <td>
               <div class="stock-box" [ngClass]="obtenerClaseStock(producto)">
                 <span class="stock-numero">
@@ -181,6 +230,9 @@
                 </small>
               </div>
             </td>
+=======
+            <td>{{ obtenerStock(producto) }}</td>
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
             <td>{{ obtenerCategoria(producto) || 'N/A' }}</td>
             <td>{{ obtenerMarca(producto) || 'N/A' }}</td>
             <td>{{ obtenerProveedor(producto) || 'N/A' }}</td>
@@ -191,13 +243,29 @@
               </span>
             </td>
             <td>
+<<<<<<< HEAD
               <span class="badge" [class.bg-success]="obtenerEstado(producto)"
                 [class.bg-secondary]="!obtenerEstado(producto)">
+=======
+              <span
+                class="badge"
+                [class.bg-success]="obtenerEstado(producto)"
+                [class.bg-secondary]="!obtenerEstado(producto)"
+              >
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
                 {{ obtenerEstado(producto) ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
             <td>
+<<<<<<< HEAD
               <img [src]="obtenerImagen(producto)" [alt]="obtenerNombre(producto)" class="product-img-admin">
+=======
+              <img
+                [src]="obtenerImagen(producto)"
+                [alt]="obtenerNombre(producto)"
+                class="product-img-admin"
+              >
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
             </td>
             <td>
               <div class="d-flex gap-2">
@@ -232,7 +300,15 @@
             </button>
           </li>
 
+<<<<<<< HEAD
           <li class="page-item" *ngFor="let pagina of obtenerPaginas()" [class.active]="pagina === paginaActual">
+=======
+          <li
+            class="page-item"
+            *ngFor="let pagina of obtenerPaginas()"
+            [class.active]="pagina === paginaActual"
+          >
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
             <button class="page-link" (click)="cambiarPagina(pagina)">
               {{ pagina }}
             </button>

@@ -14,8 +14,11 @@ export class AdminProductosComponent implements OnInit {
   @Input() cambiarVista!: (vista: string) => void;
   @Input() cerrarSesion!: () => void;
   @Input() editarProducto!: (producto: any) => void;
+<<<<<<< HEAD
   @Input() crearProducto!: () => void;
   @Input() vistaActual = '';
+=======
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 
   productos: any[] = [];
   productosFiltrados: any[] = [];
@@ -31,7 +34,11 @@ export class AdminProductosComponent implements OnInit {
   filtroPrecio = 2000;
 
   paginaActual = 1;
+<<<<<<< HEAD
   productosPorPagina = 8;
+=======
+  productosPorPagina = 6;
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
   totalPaginas = 1;
 
   mensaje = '';
@@ -49,15 +56,26 @@ export class AdminProductosComponent implements OnInit {
           ? respuesta
           : respuesta.data || [];
 
+<<<<<<< HEAD
         this.cargarFiltrosDesdeProductos();
         this.aplicarFiltros(false);
       },
       error: () => {
         this.mensaje = 'No se pudieron cargar los productos.';
+=======
+        this.productosFiltrados = [...this.productos];
+
+        this.cargarFiltros();
+        this.actualizarPaginacion();
+      },
+      error: () => {
+        this.mensaje = 'Error al cargar productos desde el backend.';
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
       }
     });
   }
 
+<<<<<<< HEAD
   nuevoProducto(): void {
   if (this.crearProducto) {
     this.crearProducto();
@@ -123,12 +141,33 @@ obtenerTextoStock(producto: any): string {
 
   aplicarFiltros(resetearPagina: boolean = true): void {
     const texto = this.buscarProducto.trim().toLowerCase();
+=======
+  cargarFiltros(): void {
+    const categoriasSet = new Set<string>();
+    const marcasSet = new Set<string>();
+
+    this.productos.forEach(producto => {
+      const categoria = this.obtenerCategoria(producto);
+      const marca = this.obtenerMarca(producto);
+
+      if (categoria) categoriasSet.add(categoria);
+      if (marca) marcasSet.add(marca);
+    });
+
+    this.categorias = Array.from(categoriasSet);
+    this.marcas = Array.from(marcasSet);
+  }
+
+  aplicarFiltros(): void {
+    const busqueda = this.buscarProducto.trim().toLowerCase();
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 
     this.productosFiltrados = this.productos.filter(producto => {
       const nombre = this.obtenerNombre(producto).toLowerCase();
       const sku = this.obtenerSku(producto).toLowerCase();
       const categoria = this.obtenerCategoria(producto);
       const marca = this.obtenerMarca(producto);
+<<<<<<< HEAD
       const estado = this.obtenerEstado(producto);
       const precio = this.obtenerPrecio(producto);
 
@@ -158,6 +197,21 @@ obtenerTextoStock(producto: any): string {
       this.paginaActual = 1;
     }
 
+=======
+      const estado = String(this.obtenerEstado(producto));
+      const precio = this.obtenerPrecio(producto);
+
+      const coincideBusqueda = !busqueda || nombre.includes(busqueda) || sku.includes(busqueda);
+      const coincideCategoria = !this.filtroCategoria || categoria === this.filtroCategoria;
+      const coincideMarca = !this.filtroMarca || marca === this.filtroMarca;
+      const coincideEstado = !this.filtroEstado || estado === this.filtroEstado;
+      const coincidePrecio = precio <= this.filtroPrecio;
+
+      return coincideBusqueda && coincideCategoria && coincideMarca && coincideEstado && coincidePrecio;
+    });
+
+    this.paginaActual = 1;
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
     this.actualizarPaginacion();
   }
 
@@ -167,9 +221,16 @@ obtenerTextoStock(producto: any): string {
     this.filtroMarca = '';
     this.filtroEstado = '';
     this.filtroPrecio = 2000;
+<<<<<<< HEAD
     this.paginaActual = 1;
 
     this.aplicarFiltros();
+=======
+
+    this.productosFiltrados = [...this.productos];
+    this.paginaActual = 1;
+    this.actualizarPaginacion();
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
   }
 
   actualizarPaginacion(): void {
@@ -215,6 +276,7 @@ obtenerTextoStock(producto: any): string {
   }
 
   eliminarProducto(producto: any): void {
+<<<<<<< HEAD
     const confirmar = confirm(`¿Deseas desactivar el producto "${this.obtenerNombre(producto)}"?`);
 
     if (!confirmar) return;
@@ -228,11 +290,32 @@ obtenerTextoStock(producto: any): string {
       },
       error: (error: any) => {
         this.mensaje = error.error?.mensaje || 'No se pudo desactivar el producto.';
+=======
+    const id = this.obtenerId(producto);
+
+    if (!id) {
+      alert('No se encontró el ID del producto.');
+      return;
+    }
+
+    const confirmar = confirm(`¿Desea eliminar el producto "${this.obtenerNombre(producto)}"?`);
+
+    if (!confirmar) return;
+
+    this.productoService.eliminarProducto(id).subscribe({
+      next: () => {
+        alert('Producto eliminado correctamente.');
+        this.cargarProductos();
+      },
+      error: () => {
+        alert('Error al eliminar producto.');
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
       }
     });
   }
 
   obtenerId(producto: any): string {
+<<<<<<< HEAD
     return String(
       producto?.ProductoID ??
       producto?.productoID ??
@@ -279,10 +362,51 @@ obtenerTextoStock(producto: any): string {
   obtenerEstado(producto: any): boolean {
     if (producto?.Estado !== undefined) return Boolean(producto.Estado);
     if (producto?.estado !== undefined) return Boolean(producto.estado);
+=======
+    return producto.productoId || producto.ProductoId || producto._id || producto.id || '';
+  }
+
+  obtenerNombre(producto: any): string {
+    return producto.nombre || producto.Nombre || 'Sin nombre';
+  }
+
+  obtenerPrecio(producto: any): number {
+    return Number(producto.precio || producto.Precio || 0);
+  }
+
+  obtenerStock(producto: any): number {
+    return Number(producto.stock || producto.Stock || 0);
+  }
+
+  obtenerCategoria(producto: any): string {
+    return producto.categoria || producto.Categoria || producto.nombreCategoria || producto.NombreCategoria || '';
+  }
+
+  obtenerMarca(producto: any): string {
+    return producto.marca || producto.Marca || producto.nombreMarca || producto.NombreMarca || '';
+  }
+
+  obtenerProveedor(producto: any): string {
+    return producto.proveedor || producto.Proveedor || producto.nombreProveedor || producto.NombreProveedor || '';
+  }
+
+  obtenerSku(producto: any): string {
+    return producto.sku || producto.SKU || producto.codigo || producto.Codigo || 'N/A';
+  }
+
+  obtenerDescripcion(producto: any): string {
+    return producto.descripcion || producto.Descripcion || 'Sin descripción';
+  }
+
+  obtenerEstado(producto: any): boolean {
+    if (producto.estado !== undefined) return producto.estado;
+    if (producto.Estado !== undefined) return producto.Estado;
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
     return true;
   }
 
   obtenerImagen(producto: any): string {
+<<<<<<< HEAD
     const imagen =
       producto?.Imagen ||
       producto?.imagen ||
@@ -297,5 +421,8 @@ obtenerTextoStock(producto: any): string {
     if (imagen.startsWith('/')) return `http://localhost:3000${imagen}`;
 
     return imagen;
+=======
+    return producto.imagen || producto.Imagen || 'assets/img/EasyCommerce.png';
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
   }
 }

@@ -2,6 +2,7 @@
 
   <!-- Barra lateral -->
   <div class="sidebar">
+<<<<<<< HEAD
   <div class="sidebar-title">
     <i class="fa fa-cubes"></i>
     <span>Administración</span>
@@ -218,5 +219,164 @@
 
     </div>
 
+=======
+    <h4>Administración</h4>
+
+    <nav class="nav flex-column">
+      <a class="nav-link" href="#" (click)="irA('admin-productos', $event)">
+        Productos
+      </a>
+
+      <a class="nav-link" href="#" (click)="irA('admin-usuarios', $event)">
+        Usuarios
+      </a>
+
+      <a class="nav-link active" href="#" (click)="irA('admin-pedidos', $event)">
+        Pedidos
+      </a>
+
+      <a class="nav-link" href="#" (click)="logout($event)">
+        Cerrar sesión
+      </a>
+    </nav>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="content">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
+      <div>
+        <h3 class="mb-1">Pedidos por Usuario</h3>
+        <p class="text-muted mb-0">
+          Consulta y administra los pedidos registrados por cada usuario.
+        </p>
+      </div>
+    </div>
+
+    <div *ngIf="pedidosPorUsuario.length === 0" class="pedidos-empty text-center text-muted">
+      <i class="fa fa-receipt fa-3x mb-3"></i>
+      <p class="mb-0">No hay pedidos registrados.</p>
+    </div>
+
+    <div class="accordion-custom" *ngIf="pedidosPorUsuario.length > 0">
+
+      <div
+        class="usuario-pedidos-card"
+        *ngFor="let usuario of pedidosPorUsuario"
+      >
+
+        <!-- Encabezado usuario -->
+        <button
+          class="usuario-header"
+          type="button"
+          (click)="alternarUsuario(usuario.usuarioId)"
+        >
+          <div>
+            <h5 class="mb-1">{{ usuario.nombreUsuario }}</h5>
+            <p class="mb-0 text-muted small">{{ usuario.correo }}</p>
+          </div>
+
+          <div class="usuario-resumen">
+            <span class="badge bg-dark">
+              {{ usuario.pedidos.length }} pedido(s)
+            </span>
+
+            <span class="fw-bold">
+              ${{ obtenerTotalPedidos(usuario).toFixed(2) }}
+            </span>
+
+            <i
+              class="fa"
+              [class.fa-chevron-down]="usuarioExpandido !== usuario.usuarioId"
+              [class.fa-chevron-up]="usuarioExpandido === usuario.usuarioId"
+            ></i>
+          </div>
+        </button>
+
+        <!-- Pedidos del usuario -->
+        <div
+          class="usuario-body"
+          *ngIf="usuarioExpandido === usuario.usuarioId"
+        >
+
+          <div
+            class="pedido-card"
+            *ngFor="let pedido of usuario.pedidos"
+            [class.pedido-entregado]="pedido.estado === 'Entregado'"
+          >
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
+              <div>
+                <h6 class="fw-bold mb-1">
+                  Pedido {{ pedido.id }}
+                </h6>
+
+                <p class="text-muted small mb-0">
+                  Fecha: {{ pedido.fecha }}
+                </p>
+              </div>
+
+              <div class="d-flex align-items-center gap-2">
+                <span
+                  class="badge"
+                  [ngClass]="obtenerClaseEstado(pedido.estado)"
+                >
+                  {{ pedido.estado }}
+                </span>
+
+                <span class="fw-bold">
+                  ${{ pedido.total.toFixed(2) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="table-responsive table-productos-pedido">
+              <table class="table table-sm align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th class="text-center">Cantidad</th>
+                    <th class="text-end">Precio</th>
+                    <th class="text-end">Subtotal</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let producto of pedido.productos">
+                    <td>{{ producto.nombre }}</td>
+                    <td class="text-center">{{ producto.cantidad }}</td>
+                    <td class="text-end">${{ producto.precio.toFixed(2) }}</td>
+                    <td class="text-end">
+                      ${{ (producto.precio * producto.cantidad).toFixed(2) }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-3">
+              <button
+                class="btn btn-sm btn-outline-success"
+                (click)="marcarComoEntregado(pedido)"
+                [disabled]="pedido.estado === 'Entregado' || pedido.estado === 'Cancelado'"
+              >
+                Marcar entregado
+              </button>
+
+              <button
+                class="btn btn-sm btn-outline-danger"
+                (click)="cancelarPedido(pedido)"
+                [disabled]="pedido.estado === 'Entregado' || pedido.estado === 'Cancelado'"
+              >
+                Cancelar pedido
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
   </div>
 </div>

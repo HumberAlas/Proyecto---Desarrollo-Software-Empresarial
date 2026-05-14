@@ -10,10 +10,15 @@ export interface LoginResponse {
   nombre?: string;
   correo?: string;
   rol?: string;
+<<<<<<< HEAD
   metodoLogin?: string;
   usuario?: {
     id?: string;
     _id?: string;
+=======
+  usuario?: {
+    id?: string;
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
     nombre?: string;
     correo?: string;
     rol?: string;
@@ -57,6 +62,7 @@ export class AuthService {
   cerrarSesion(): void {
     localStorage.clear();
   }
+<<<<<<< HEAD
 
   loginGoogle(idToken: string): Observable<LoginResponse> {
   return this.http.post<LoginResponse>(
@@ -66,4 +72,6 @@ export class AuthService {
     }
   );
 }
+=======
+>>>>>>> 2d2df73c1ec3a3bb4ba8321b4b3c7d3ee12d8ba7
 }
